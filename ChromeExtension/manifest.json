@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Nox",
+  "version": "1.2.0",
+  "description": "Turns web pages dark when Nox turns your computer dark.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtnH0GH8J9FAIgRvWannrPcrpUo/C1oVpZ3jBqOmY5bYPoaUFwJiGwHJdzj9m5PNgIimw2T8rhTVjV73yGfVVnCyMqG9Chao8LorvbKJQllI1rrwYtlI3lO7VFkIXWEy2cFrBnfyiBuyYPSL7EW509ypvTNrkHhZ3ERYVpAMvuafRzHG77gqC53/X3engBk91kLxelsDPaghluEAI6ZOHjklCiDsIxSTi9vfr+M5uHgl6A3NiZa376ujxNWjlvD5YUOnQ5ca5MXmBnQEqXTBVNgKtLMZ50crguu/lhBGGzBnmOk00X9tXghAiSLDLZ4FhQsfja8xeWyxoYO5Oj2chBwIDAQAB",
+  "icons": {"128": "images/icon-128.png"},
+  "permissions": ["nativeMessaging"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [
+    {"matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_start", "all_frames": true}
+  ]
+}

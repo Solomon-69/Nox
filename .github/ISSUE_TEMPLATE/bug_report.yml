@@ -1,0 +1,63 @@
+name: Bug report
+description: Something is not working the way it should
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Click the Nox switch in the menu bar
+        2. Open a website in Safari
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: System
+      options:
+        - Mac
+        - Windows
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: System version
+      placeholder: "macOS 26.1 or Windows 11 24H2"
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Safari
+        - Chrome
+        - Edge
+        - Other
+        - Not about websites
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install Nox?
+      options:
+        - Downloaded the release
+        - Built from source
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Website address (if a site looks wrong)
+    validations:
+      required: false

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nox: one switch for light and dark</title>
+<meta name="description" content="Nox is a free menu bar app for Mac and Windows. One click flips your Mac between light and dark, and the Safari and Chrome extensions darken web pages while Nox's switch is on.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f4f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15131c" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Nox">
+<meta property="og:description" content="One click flips your Mac between light and dark. Free for Mac and Windows.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="showcase/nox-1-light.png">
+<link rel="icon" type="image/png" href="img/icon.png">
+<link rel="apple-touch-icon" href="img/icon.png">
+<style>
+  :root {
+    --bg: #f5f4f9;
+    --bg-2: #eceaf3;
+    --surface: #ffffff;
+    --ink: #1c1a24;
+    --ink-2: #625d70;
+    --ink-3: #8c869a;
+    --line: rgba(28, 26, 36, 0.10);
+    --accent: #7c3aed;
+    --accent-deep: #6d28d9;
+    --accent-soft: rgba(124, 58, 237, 0.12);
+    --shadow: 0 1px 1px rgba(30, 20, 50, 0.04), 0 10px 30px -12px rgba(30, 20, 50, 0.22);
+    --shadow-lift: 0 2px 2px rgba(30, 20, 50, 0.05), 0 30px 60px -24px rgba(30, 20, 50, 0.35);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    --font-round: ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", -apple-system, system-ui, sans-serif;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15131c;
+      --bg-2: #1d1a26;
+      --surface: #221f2c;
+      --ink: #efeef5;
+      --ink-2: #b3adc2;
+      --ink-3: #847d93;
+      --line: rgba(239, 238, 245, 0.09);
+      --accent-deep: #b49af7;
+      --accent-soft: rgba(124, 58, 237, 0.22);
+      --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 12px 30px -12px rgba(0, 0, 0, 0.7);
+      --shadow-lift: 0 2px 2px rgba(0, 0, 0, 0.3), 0 30px 60px -24px rgba(0, 0, 0, 0.85);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15131c;
+    --bg-2: #1d1a26;
+    --surface: #221f2c;
+    --ink: #efeef5;
+    --ink-2: #b3adc2;
+    --ink-3: #847d93;
+    --line: rgba(239, 238, 245, 0.09);
+    --accent-deep: #b49af7;
+    --accent-soft: rgba(124, 58, 237, 0.22);
+    --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 12px 30px -12px rgba(0, 0, 0, 0.7);
+    --shadow-lift: 0 2px 2px rgba(0, 0, 0, 0.3), 0 30px 60px -24px rgba(0, 0, 0, 0.85);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 var(--font); -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  img, svg { display: block; max-width: 100%; }
+  .wrap { width: min(1080px, 100% - 32px); margin-inline: auto; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--bg); padding: 8px 12px; border-radius: 8px; z-index: 10; }
+  .skip:focus { left: 8px; }
+
+  /* header */
+  header.top { position: sticky; top: 0; z-index: 5; backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid transparent; transition: border-color .3s; }
+  header.top.scrolled { border-bottom-color: var(--line); }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 700 18px/1 var(--font-round); letter-spacing: -0.01em; }
+  .mark { width: 34px; height: 34px; flex: none; transition: transform .45s var(--spring); border-radius: 9px; overflow: hidden; }
+  .mark img { width: 100%; height: 100%; }
+  .brand:hover .mark { transform: rotate(-8deg) scale(1.06); }
+  nav ul { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  nav a { display: inline-block; padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--ink-2); font-size: 14.5px; transition: color .2s, background .2s; }
+  nav a:hover { color: var(--ink); background: var(--accent-soft); }
+  @media (max-width: 560px) { nav li.opt { display: none; } }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; padding: 72px 0 88px; }
+  @media (max-width: 880px) { .hero { grid-template-columns: 1fr; gap: 48px; padding: 44px 0 64px; } }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); padding: 5px 12px 5px 8px; border-radius: 999px; }
+  .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .appicon { display: block; width: 96px; height: 96px; margin: 0 0 18px -6px; animation: iconIn 1s var(--spring) both; }
+  .appicon img { width: 100%; height: 100%; border-radius: 22px; filter: drop-shadow(0 14px 22px rgba(80, 40, 140, .28)); }
+  @keyframes iconIn { from { opacity: 0; transform: translateY(14px) scale(.8) rotate(-10deg); } to { opacity: 1; transform: none; } }
+  h1 { font: 800 clamp(52px, 9vw, 88px)/0.95 var(--font-round); letter-spacing: -0.035em; margin: 22px 0 10px; }
+  .sub { font: 600 clamp(21px, 3vw, 27px)/1.25 var(--font-round); color: var(--accent-deep); margin: 0 0 18px; letter-spacing: -0.01em; }
+  .lede { font-size: 17.5px; color: var(--ink-2); max-width: 34em; margin: 0 0 30px; }
+  .downloads { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    --lean-x: 0px; --lean-y: 0px;
+    position: relative; display: inline-flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 22px 0 18px;
+    border-radius: 16px; text-decoration: none; font-weight: 650; font-size: 16px; letter-spacing: -0.005em;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
+    transform: translate(var(--lean-x), var(--lean-y)); transition: transform .35s var(--spring), box-shadow .3s, background .2s;
+    overflow: hidden; isolation: isolate;
+  }
+  .btn svg.os { width: 22px; height: 22px; flex: none; }
+  .btn small { display: block; font-weight: 500; font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+  .btn .arrow { width: 16px; height: 16px; margin-left: 2px; opacity: 0; transform: translateX(-6px); transition: opacity .25s, transform .35s var(--spring); }
+  .btn:hover { box-shadow: var(--shadow-lift); }
+  .btn:hover .arrow { opacity: 1; transform: translateX(0); }
+  .btn:active { transform: translate(var(--lean-x), var(--lean-y)) scale(.97); transition-duration: .12s; }
+  .btn::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(160px circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, .16), transparent 60%); opacity: 0; transition: opacity .3s; }
+  .btn:hover::before { opacity: 1; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .btn.primary small { color: rgba(255, 255, 255, .72); }
+  .reqs { margin: 18px 0 0; font-size: 13.5px; color: var(--ink-3); }
+  .reqs b { color: var(--ink-2); font-weight: 600; }
+
+  .stagebox { position: relative; display: grid; place-items: center; }
+  .glow { position: absolute; inset: 8% 4%; background: radial-gradient(closest-side, var(--accent-soft), transparent); filter: blur(10px); }
+  .shot { position: relative; width: min(560px, 100%); margin: 0 auto; animation: pop .9s var(--spring) both .2s; }
+  .shot img { width: 100%; height: auto; border-radius: 14px; box-shadow: var(--shadow-lift); }
+  .shot .float { display: block; animation: float 7s ease-in-out infinite 1.2s; }
+  @keyframes pop { from { opacity: 0; transform: scale(.94) translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  /* sections */
+  section { padding: 76px 0; }
+  section + section { border-top: 1px solid var(--line); }
+  .kicker { font-size: 13px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-deep); margin: 0 0 10px; }
+  h2 { font: 750 clamp(30px, 4.4vw, 42px)/1.08 var(--font-round); letter-spacing: -0.025em; margin: 0 0 14px; }
+  .intro { color: var(--ink-2); max-width: 40em; margin: 0 0 36px; font-size: 17px; }
+
+  .points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .points { grid-template-columns: 1fr; } }
+  .point { background: var(--surface); border-radius: 18px; padding: 22px; box-shadow: var(--shadow); }
+  .point svg { width: 26px; height: 26px; color: var(--accent); margin-bottom: 12px; }
+  .point h3 { margin: 0 0 6px; font: 700 18px/1.25 var(--font-round); }
+  .point p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 800px) { .gallery { grid-template-columns: 1fr; max-width: 420px; margin-inline: auto; } }
+  .gallery figure { margin: 0; }
+  .gallery img { width: 100%; height: auto; border-radius: 12px; box-shadow: var(--shadow); transition: transform .5s var(--spring); }
+  .gallery figure:hover img { transform: translateY(-6px) rotate(-.6deg); }
+  .gallery.welcome { max-width: 900px; margin: 0 auto; }
+  .gallery.welcome figure:nth-child(2) { margin-top: 0; }
+  .gallery.welcome img { border-radius: 20px; box-shadow: var(--shadow-lift); }
+  @media (max-width: 800px) { .gallery.welcome { max-width: 340px; } }
+  .dlnote { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); }
+  .gallery figcaption { text-align: center; font-size: 14px; color: var(--ink-2); margin-top: 8px; }
+
+  .install { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .install { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border-radius: 20px; padding: 26px 26px 22px; box-shadow: var(--shadow); }
+  .card h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; font: 700 21px/1.2 var(--font-round); }
+  .card h3 svg { width: 22px; height: 22px; }
+  .card .req { margin: 0 0 16px; font-size: 14px; color: var(--ink-3); }
+  .card ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+  .card li { counter-increment: s; position: relative; padding: 0 0 14px 40px; color: var(--ink-2); font-size: 15px; }
+  .card li::before { content: counter(s); position: absolute; left: 0; top: -1px; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 700 13px/1 var(--font-round); background: var(--accent-soft); color: var(--accent-deep); }
+  .card li b { color: var(--ink); font-weight: 600; }
+  .card .why { margin: 6px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--bg); font-size: 13.5px; color: var(--ink-2); }
+  kbd { font: 600 12px/1 var(--font); padding: 3px 6px; border-radius: 6px; background: var(--bg-2); border: 1px solid var(--line); color: var(--ink); white-space: nowrap; }
+
+  .faq { max-width: 760px; }
+  details { border-bottom: 1px solid var(--line); }
+  summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 2px; font: 650 17px/1.35 var(--font); }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: ""; flex: none; width: 10px; height: 10px; border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3); transform: rotate(45deg) translate(-2px, -2px); transition: transform .3s var(--spring); }
+  details[open] summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+  details p { margin: -6px 2px 20px; color: var(--ink-2); font-size: 15.5px; max-width: 42em; }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 0 44px; color: var(--ink-3); font-size: 13.5px; }
+  footer .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; }
+  footer a { color: var(--ink-2); }
+  footer p { margin: 0 0 6px; }
+
+  /* scroll reveal: replays each time a block comes into view */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease-out), transform .8s var(--ease-out); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    .js .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top" id="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="Nox, back to top">
+      <span class="mark"><img src="img/icon.png" width="34" height="34" alt=""></span>
+      Nox
+    </a>
+    <nav aria-label="Sections">
+      <ul>
+        <li class="opt"><a href="#features">Features</a></li>
+        <li class="opt"><a href="#welcome">Welcome</a></li>
+        <li><a href="#install">Install</a></li>
+        <li class="opt"><a href="#faq">FAQ</a></li>
+        <li><a href="https://github.com/Solomon-69/Nox" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap hero">
+    <div>
+      <picture class="appicon">
+        <img src="img/icon.png" width="96" height="96" alt="The Nox app icon">
+      </picture>
+      <span class="eyebrow"><i aria-hidden="true"></i>Free for Mac and Windows</span>
+      <h1>Nox</h1>
+      <p class="sub">One click flips your Mac between light and dark</p>
+      <p class="lede">Nox is a small menu bar app. Click its switch and your whole Mac goes dark or light. Add the Safari or Chrome extension and web pages go dark too, while Nox's own switch is on.</p>
+      <div class="downloads">
+        <a class="btn primary" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg" target="_blank" rel="noopener">
+          <svg class="os" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>
+          <span>Download for Mac<small>macOS 13 or later</small></span>
+          <svg class="arrow" aria-hidden="true" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>
+        </a>
+        <a class="btn" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip" target="_blank" rel="noopener">
+          <svg class="os" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.3l7.4-1v7.2H3zM11.3 4.2L21 2.8v8.7h-9.7zM3 12.4h7.4v7.2L3 18.6zM11.3 12.4H21v8.8l-9.7-1.4z"/></svg>
+          <span>Download for Windows<small>Windows 10 or 11</small></span>
+          <svg class="arrow" aria-hidden="true" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+      <p class="dlnote">Version 1.0.1. The download buttons give the last published build (1.0.0). The newest version is published when its builds are ready.</p>
+      <p class="reqs"><b>Mac:</b> macOS 13 or later. <b>Windows:</b> Windows 10 or 11, with the free .NET 8 Desktop Runtime. Free, open source (MIT licence), no account needed.</p>
+    </div>
+
+    <div class="stagebox">
+      <div class="glow" aria-hidden="true"></div>
+      <div class="shot">
+        <picture class="float">
+          <source media="(prefers-color-scheme: dark)" srcset="showcase/nox-1-dark.png">
+          <img src="showcase/nox-1-light.png" width="1760" height="1120" fetchpriority="high" alt="The Nox panel open under its menu bar switch">
+        </picture>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <p class="kicker reveal">What it does</p>
+      <h2 class="reveal">Dark mode, one click away</h2>
+      <p class="intro reveal">macOS dark mode normally stops at the edge of the browser, so most websites stay bright. Nox fixes that while its switch is on.</p>
+      <div class="points">
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+          <h3>One switch for the whole Mac</h3>
+          <p>Click the switch in the menu bar to flip light and dark. Right-click it to open the panel.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg>
+          <h3>Websites follow along</h3>
+          <p>With the Safari or Chrome extension on, bright pages get a dark look while Nox is dark. Pages that already have a dark design are left alone.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6z"/></svg>
+          <h3>Private by design</h3>
+          <p>No account, no network access and no analytics. The extension only checks whether Nox's switch is on. It never reads or sends what you browse.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="v2">
+    <div class="wrap">
+      <p class="kicker reveal">New in V2</p>
+      <h2 class="reveal">A smoother switch, and a better Windows setup</h2>
+      <p class="intro reveal">V2 makes the change from light to dark gentler and easier to live with.</p>
+      <div class="points">
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v4l2.5 2"/></svg>
+          <h3>A smooth fade</h3>
+          <p>Nox fades to dark or light and waits until every app has finished changing, so you never see a half-switched screen.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6z"/></svg>
+          <h3>Other apps' menus stay open</h3>
+          <p>Flipping the switch no longer closes menus that other apps have open.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg>
+          <h3>Websites dark on Windows</h3>
+          <p>There is now a short setup for websites on Windows too, so pages can follow the switch there as well.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 15V3M8 7l4-4 4 4M5 12v7h14v-7"/></svg>
+          <h3>Share with a friend</h3>
+          <p>On a Mac, one click packs the app up and opens the share sheet, so you can send it to a friend by AirDrop.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg>
+          <h3>Menus stay open</h3>
+          <p>Click another icon in the menu bar and this panel stays open instead of closing on you.</p>
+        </div>
+        <div class="point reveal">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 5l7-1v7H4zM13 4l7-1v8h-7zM4 13h7v7l-7-1zM13 13h7v8l-7-1z"/></svg>
+          <h3>No zoom on Windows</h3>
+          <p>Pinch, Ctrl and the mouse wheel, and Ctrl with plus or minus no longer zoom the Nox panel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="wrap">
+      <p class="kicker reveal">A closer look</p>
+      <h2 class="reveal">Set the night, skip the glare</h2>
+      <p class="intro reveal">Screenshots of Nox. It also turns on by itself at the times you choose.</p>
+      <div class="gallery">
+        <figure class="reveal">
+          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-2-dark.png"><img src="showcase/nox-2-light.png" width="1760" height="1120" loading="lazy" alt="The same web page before and with Nox: bright on the left, dark on the right"></picture>
+          <figcaption>Bright pages, dark when Nox is on</figcaption>
+        </figure>
+        <figure class="reveal">
+          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-3-dark.png"><img src="showcase/nox-3-light.png" width="1760" height="1120" loading="lazy" alt="The Nox Settings window with dark at night times and quick picks"></picture>
+          <figcaption>Dark at night, on its own schedule</figcaption>
+        </figure>
+        <figure class="reveal">
+          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-4-dark.png"><img src="showcase/nox-4-light.png" width="1760" height="1120" loading="lazy" alt="Three windows fading from light to dark"></picture>
+          <figcaption>A soft fade, never a flash</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="welcome">
+    <div class="wrap">
+      <p class="kicker reveal">Version 1.0.1</p>
+      <h2 class="reveal">A calm first minute</h2>
+      <p class="intro reveal">Three short pages: what Nox does, the permissions it asks for, and three tips. A frosted glass panel, and each page plays its animation once.</p>
+      <div class="gallery welcome">
+        <figure class="reveal">
+          <img src="intro/nox-welcome-1.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 1: What Nox does">
+          <figcaption>What Nox does</figcaption>
+        </figure>
+        <figure class="reveal">
+          <img src="intro/nox-welcome-2.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 2: Three quick steps, each with its own Allow window">
+          <figcaption>Three quick steps, each with its own Allow window</figcaption>
+        </figure>
+        <figure class="reveal">
+          <img src="intro/nox-welcome-3.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 3: You're all set, with three tips">
+          <figcaption>You're all set, with three tips</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <p class="kicker reveal">Install</p>
+      <h2 class="reveal">A few steps, then it stays out of the way</h2>
+      <p class="intro reveal">Nox is not sold through an app store, so your computer may ask you to confirm it the first time you open it.</p>
+      <div class="install">
+        <div class="card reveal">
+          <h3><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>Mac</h3>
+          <p class="req">macOS 13 or later</p>
+          <ol>
+            <li><b>Download</b> Nox.dmg, open it and drag <b>Nox</b> into Applications.</li>
+            <li>Open Nox. A small switch appears in the menu bar.</li>
+            <li>Follow the welcome window and press <b>Allow</b> on Apple's prompts. Nox needs this to change light and dark.</li>
+            <li>For Safari: go to <b>Safari, Settings, Extensions</b>, tick <b>Nox</b>, then click <b>Edit Websites</b> and set it to <b>Allow</b>.</li>
+            <li>For Chrome: in the Nox panel click <b>Open extension folder</b>. In Chrome, open <b>chrome://extensions</b>, turn on <b>Developer mode</b>, click <b>Load unpacked</b> and choose that folder.</li>
+          </ol>
+          <p class="why">Why the extra steps: browsers need permission before an extension can change how a page looks.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Windows</h3>
+          <p class="req">Windows 10 or 11</p>
+          <ol>
+            <li><b>Download</b> Nox-windows.zip and choose <b>Extract All</b>.</li>
+            <li>If asked, install the free <b>.NET 8 Desktop Runtime</b> from Microsoft.</li>
+            <li>Run <b>Nox</b> from the extracted folder. Click the icon in the system tray (near the clock) to flip Windows between light and dark.</li>
+            <li>If Windows shows a warning, click <b>More info</b>, then <b>Run anyway</b>.</li>
+          </ol>
+          <p class="why">Why the warning: the Windows app is not code signed yet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap faq">
+      <p class="kicker reveal">Questions</p>
+      <h2 class="reveal">Good to know</h2>
+      <details class="reveal">
+        <summary>Why do websites stay bright?</summary>
+        <p>Check that Nox's switch is on, that the extension is ticked in Safari with Edit Websites set to Allow, and that the extension is loaded in Chrome.</p>
+      </details>
+      <details class="reveal">
+        <summary>Do pages change when my Mac goes dark by itself?</summary>
+        <p>No. Web pages only go dark when Nox's own switch is on. Your Mac's dark mode on its own does not change them.</p>
+      </details>
+      <details class="reveal">
+        <summary>Why does it ask for Automation and Screen Recording?</summary>
+        <p>Automation lets Nox switch light and dark. Screen Recording is only for the smooth fade: Nox takes one still picture at the moment of switching. The picture stays in memory and is never saved or sent.</p>
+      </details>
+      <details class="reveal">
+        <summary>Some sites look wrong when forced dark.</summary>
+        <p>Forcing a dark look on every page cannot be perfect. If one looks odd, turn the website option off in the panel, and please report the address on <a href="https://github.com/Solomon-69/Nox/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+      </details>
+      <details class="reveal">
+        <summary>Does it collect any data?</summary>
+        <p>No. Nox, the Safari extension and the Chrome extension make no network requests and have no analytics or accounts. The full detail is in the <a href="https://github.com/Solomon-69/Nox/blob/main/PRIVACY.md" target="_blank" rel="noopener">privacy notes</a>.</p>
+      </details>
+    </div>
+  </section>
+<section style="max-width:720px;margin:48px auto;padding:0 20px;font:15px/1.6 system-ui,-apple-system,sans-serif;color:inherit"><h2 style="font-size:20px;margin:0 0 8px">Unsigned app: how to open it</h2><p>This app is not signed yet (Apple's developer account is paid, and one is not set up yet), so your computer warns you the first time. <b>Mac:</b> right-click the app, choose <b>Open</b>, then <b>Open</b> again (or System Settings &gt; Privacy &amp; Security &gt; <b>Open Anyway</b>). <b>Windows:</b> in SmartScreen click <b>More info</b>, then <b>Run anyway</b>. You can check your download against the SHA-256 fingerprints listed in the project's CHECKSUMS.md on GitHub.</p></section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <div>
+      <p>Nox. Copyright (c) 2026 Solomon. Released under the <a href="https://github.com/Solomon-69/Nox/blob/main/LICENSE" target="_blank" rel="noopener">MIT licence</a>.</p>
+    </div>
+    <div>
+      <p><a href="https://github.com/Solomon-69/Nox" target="_blank" rel="noopener">GitHub</a> &middot; <a href="https://github.com/Solomon-69/Nox/releases" target="_blank" rel="noopener">All releases</a> &middot; <a href="#top">Back to top</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    root.classList.add('js');
+
+    var header = document.getElementById('top');
+    var onScroll = function () { header.classList.toggle('scrolled', window.scrollY > 8); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Buttons: a soft glow follows the cursor and the button leans toward it a little.
+    if (!reduce && window.matchMedia('(hover: hover)').matches) {
+      document.querySelectorAll('.btn').forEach(function (b) {
+        b.addEventListener('pointermove', function (e) {
+          var r = b.getBoundingClientRect();
+          var x = e.clientX - r.left, y = e.clientY - r.top;
+          b.style.setProperty('--gx', x + 'px');
+          b.style.setProperty('--gy', y + 'px');
+          b.style.setProperty('--lean-x', ((x / r.width) - 0.5) * 6 + 'px');
+          b.style.setProperty('--lean-y', ((y / r.height) - 0.5) * 4 + 'px');
+        });
+        b.addEventListener('pointerleave', function () {
+          b.style.setProperty('--lean-x', '0px');
+          b.style.setProperty('--lean-y', '0px');
+        });
+      });
+    }
+
+    // Reveal blocks as they scroll into view, in both directions, so the motion replays.
+    var items = document.querySelectorAll('.reveal');
+    if (reduce || !('IntersectionObserver' in window)) {
+      items.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        entry.target.classList.toggle('in', entry.isIntersecting);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    items.forEach(function (el, i) {
+      el.style.transitionDelay = (i % 6) * 40 + 'ms';
+      io.observe(el);
+    });
+  })();
+</script>
+</body>
+</html>

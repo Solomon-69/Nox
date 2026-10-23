@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nox</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  :root[data-theme="light"] {
+    --bg1: #F9F7FF; --bg2: #ECE7FE; --card: rgba(255,255,255,.78); --stroke: rgba(115,84,237,.14);
+    --text: #211C42; --dim: rgba(33,28,66,.58); --accent: #7354ED; --accent-deep: #5C3DDB;
+    --track-off: rgba(115,84,237,.16); --warn: #D15C1F;
+  }
+  :root[data-theme="dark"] {
+    --bg1: #12172F; --bg2: #05070F; --card: rgba(255,255,255,.06); --stroke: rgba(255,255,255,.09);
+    --text: #FFFFFF; --dim: rgba(255,255,255,.55); --accent: #8C73FF; --accent-deep: #452ECC;
+    --track-off: rgba(255,255,255,.14); --warn: #FF9E73;
+  }
+  html { background: linear-gradient(var(--bg1), var(--bg2)); min-height: 100%; transition: background .5s; }
+  body { min-height: 100vh; }
+  #root { padding: 16px 16px 14px; }
+  .card { padding: 4px 14px; }
+
+  /* status hero */
+  .hero { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .orb { position: relative; width: 40px; height: 40px; border-radius: 11px; flex: none; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .orb svg { position: absolute; inset: 0; margin: auto; width: 20px; height: 20px; transition: transform .45s var(--spring), opacity .3s; }
+  .orb .sun { color: #FF9F0A; }
+  .orb .moon { color: var(--accent); }
+  .dark .orb .sun { opacity: 0; transform: rotate(90deg) scale(.5); }
+  .orb .moon { opacity: 0; transform: rotate(-90deg) scale(.5); }
+  .dark .orb .moon { opacity: 1; transform: none; }
+  .hero h1 { margin: 0; font-size: 15px; font-weight: 600; position: relative; height: 20px; }
+  .hero h1 span { position: absolute; left: 0; white-space: nowrap; transition: opacity .3s; }
+  .hero h1 .t-dark, .dark .hero h1 .t-light { opacity: 0; }
+  .dark .hero h1 .t-dark { opacity: 1; }
+
+  /* big sun and moon switch, like the menu bar panel */
+  .big { position: relative; width: 66px; height: 34px; border-radius: 17px; flex: none;
+    background: linear-gradient(135deg, #FFD36B, #FFA94D); box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    transition: background .35s var(--ease); }
+  .big::before { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep)); transition: opacity .35s var(--ease); }
+  .big[aria-checked="true"]::before { opacity: 1; }
+  .big .knob { position: absolute; top: 4px; left: 4px; width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, #D6D9F0); box-shadow: 0 2px 5px rgba(0,0,0,.25);
+    transition: transform .34s var(--spring); }
+  .big[aria-checked="true"] .knob { transform: translateX(32px); }
+  .big:active .knob { transform: scale(.94); }
+  .big[aria-checked="true"]:active .knob { transform: translateX(32px) scale(.94); }
+
+  /* dark from / light from tabs */
+  .tabs { position: relative; display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--track-off) 60%, transparent); margin-bottom: 12px; }
+  .tabs .pill { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 5px); border-radius: 999px; background: var(--accent);
+    transition: transform .3s var(--spring); }
+  .tabs.light .pill { transform: translateX(calc(100% + 4px)); }
+  .tab { position: relative; flex: 1; height: 26px; border-radius: 999px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    color: color-mix(in srgb, var(--text) 80%, transparent); transition: color .25s; }
+  .tab b { font-variant-numeric: tabular-nums; }
+  .tab.on { color: #fff; }
+  .tab svg { width: 11px; height: 11px; }
+
+  .steps { margin: 4px 0 2px; padding-left: 18px; font-size: 12px; color: var(--text); }
+  .steps li { margin: 5px 0; }
+  .steps code { font: 11.5px Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 1px 5px; border-radius: 4px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+  .foot { display: flex; align-items: center; gap: 10px; }
+  .foot .hint { text-align: left; flex: 1; padding: 0 2px; }
+  .reveal.open + .row { border-top: 1px solid var(--stroke); }
+  .err { font-size: 11.5px; color: var(--warn); padding: 0 4px; }
+  .intro-page > .btn { margin-top: 2px; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="card hero" id="hero">
+    <div class="orb" aria-hidden="true">
+      <svg class="sun" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>
+    </div>
+    <div class="grow">
+      <h1><span class="t-light">Light now</span><span class="t-dark">Dark now</span></h1>
+      <div class="detail" id="status"></div>
+    </div>
+    <button class="big" id="big" role="switch" aria-label="Dark mode"><span class="knob"></span></button>
+  </div>
+  <div class="err" id="err" hidden></div>
+
+  <div class="card">
+    <div class="row">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg></div>
+      <div class="grow"><div class="title">Dark at night</div><div class="detail">Switches by itself at the times below</div></div>
+      <span id="swSchedule"></span>
+    </div>
+    <div class="reveal" id="timesReveal"><div>
+      <div class="sub" style="padding-top:12px">
+        <div class="tabs" id="tabs">
+          <div class="pill"></div>
+          <button class="tab on" id="tabDark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>Dark from <b id="darkAtText"></b></button>
+          <button class="tab" id="tabLight"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>Light from <b id="lightAtText"></b></button>
+        </div>
+        <div id="pickerDark"></div>
+        <div id="pickerLight" hidden></div>
+      </div>
+    </div></div>
+    <div class="row">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20 14 10M15 4v3M19 8h3M18 5l2-2M11 6V4M20 13h2"/></svg></div>
+      <div class="grow"><div class="title">Smooth fade</div><div class="detail">Cross-fades the whole screen when it switches</div></div>
+      <span id="swFade"></span>
+    </div>
+    <div class="row">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></svg></div>
+      <div class="grow"><div class="title">Open at login</div><div class="detail">Start Nox when you sign in to Windows</div></div>
+      <span id="swLogin"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10 3.5a2 2 0 0 1 4 0V5h4v4h1.5a2 2 0 0 1 0 4H18v6h-5v-1.5a2 2 0 0 0-4 0V19H4v-5h1.5a2 2 0 0 0 0-4H4V5h6z"/></svg></div>
+      <div class="grow"><div class="title">Websites follow your PC</div><div class="detail" id="extRow">Add the Chrome/Edge extension once: Gmail and every site follow</div></div>
+      <button class="btn" id="howBtn">How to</button>
+    </div>
+    <div class="reveal" id="howReveal"><div>
+      <div class="sub">
+        <ol class="steps">
+          <li>Click <b>Add to Chrome</b> or <b>Add to Edge</b>. Nox opens the extensions page and copies the folder location for you.</li>
+          <li>Turn on <b>Developer mode</b> (top right in Chrome, left side in Edge).</li>
+          <li>Click <b>Load unpacked</b>, press <b>Ctrl+V</b> in the folder box, then <b>Select Folder</b>.</li>
+        </ol>
+        <div class="btns">
+          <button class="btn solid" id="extChrome">Add to Chrome</button>
+          <button class="btn solid" id="extEdge">Add to Edge</button>
+          <button class="btn" id="extFolder">Show the folder</button>
+        </div>
+        <div class="detail" id="extStatus"></div>
+        <div class="detail">Done once: after that, every site (Gmail too) turns dark with Windows and light again with it. Nothing is read or sent.</div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="foot">
+    <div class="hint" id="hint">Click the tray icon to open Nox. Right-click it for Dark mode and Quit.</div>
+    <button class="btn plain" id="quit">Quit</button>
+  </div>
+</div>
+<script src="kit.js"></script>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let S = window.__BOOT__ || {};
+  const clock = v => kit.pad(Math.floor(v / 60)) + ':' + kit.pad(v % 60);
+
+  // Big switch: flips on the click, follows the real theme later (never snaps back while animating).
+  const big = $('big');
+  let shown = !!S.dark, lastTap = 0;
+  const paintBig = v => { shown = v; big.setAttribute('aria-checked', String(v)); $('root').classList.toggle('dark', v); };
+  big.onclick = () => { lastTap = performance.now(); paintBig(!shown); kit.post('flip', { dark: shown }); };
+
+  const swSchedule = kit.sw(S.schedule, 'Dark at night', v => { kit.reveal($('timesReveal'), v); kit.post('schedule', { on: v }); });
+  const swFade = kit.sw(S.fade, 'Smooth fade', v => kit.post('fade', { on: v }));
+  const swLogin = kit.sw(S.login, 'Open at login', v => kit.post('login', { on: v }));
+  $('swSchedule').replaceWith(swSchedule); $('swFade').replaceWith(swFade); $('swLogin').replaceWith(swLogin);
+
+  const sendTimes = () => kit.post('times', { darkAt: S.darkAt, lightAt: S.lightAt });
+  const pickDark = kit.chipDrum({ title: 'Dark from', mode: 'clock', value: S.darkAt, presets: [19 * 60, 20 * 60, 21 * 60, 22 * 60],
+    onChange: v => { S.darkAt = v; $('darkAtText').textContent = clock(v); sendTimes(); } });
+  const pickLight = kit.chipDrum({ title: 'Light from', mode: 'clock', value: S.lightAt, presets: [6 * 60, 7 * 60, 7 * 60 + 30, 8 * 60],
+    onChange: v => { S.lightAt = v; $('lightAtText').textContent = clock(v); sendTimes(); } });
+  $('pickerDark').append(pickDark); $('pickerLight').append(pickLight);
+  function tab(light) {
+    $('tabs').classList.toggle('light', light);
+    $('tabDark').classList.toggle('on', !light); $('tabLight').classList.toggle('on', light);
+    $('pickerDark').hidden = light; $('pickerLight').hidden = !light;
+    (light ? pickLight : pickDark).set(light ? S.lightAt : S.darkAt);
+    kit.reportHeight();
+  }
+  $('tabDark').onclick = () => tab(false);
+  $('tabLight').onclick = () => tab(true);
+
+  let howOpen = false;
+  $('howBtn').onclick = () => { howOpen = !howOpen; kit.reveal($('howReveal'), howOpen); $('howBtn').textContent = howOpen ? 'Hide' : 'How to'; };
+  $('extFolder').onclick = () => kit.post('extFolder');
+  $('extChrome').onclick = () => kit.post('extPage', { browser: 'chrome' });
+  $('extEdge').onclick = () => kit.post('extPage', { browser: 'edge' });
+  $('quit').onclick = () => kit.post('quit');
+
+  function render() {
+    kit.setDark(S.dark);
+    if (performance.now() - lastTap > 1600 && shown !== !!S.dark) paintBig(!!S.dark);
+    if (lastTap === 0) paintBig(!!S.dark);
+    swSchedule.follow(S.schedule); swFade.follow(S.fade); swLogin.follow(S.login);
+    kit.reveal($('timesReveal'), S.schedule);
+    $('darkAtText').textContent = clock(S.darkAt);
+    $('lightAtText').textContent = clock(S.lightAt);
+    $('status').textContent = !S.schedule ? 'Flip the switch to change your whole PC'
+      : S.dark ? 'Switches to light at ' + clock(S.lightAt) : 'Switches to dark at ' + clock(S.darkAt);
+    const e = S.ext || {};
+    const on = [e.chrome && 'Chrome', e.edge && 'Edge'].filter(Boolean);
+    $('extStatus').textContent = on.length ? 'Connected: ' + on.join(' and ') + '. Websites follow your PC.' : 'Not added yet: websites stay light until you do the steps above.';
+    $('extRow').textContent = on.length ? 'Connected in ' + on.join(' and ') + ': Gmail and every site follow Windows' : 'Not connected: Gmail and other sites stay light. Tap How to.';
+    $('howBtn').dataset.on = on.length ? '1' : '';
+    $('err').hidden = !S.error; $('err').textContent = S.error || '';
+  }
+  window.onPanelClosed = () => { if (howOpen) $('howBtn').click(); };
+  window.app = { update(state) { S = Object.assign(S, state); render(); } };
+  render();
+
+  // First run: a short welcome in place of the panel (shown once; the app remembers it).
+  const moon = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>';
+  const icons = {
+    tray: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M17 17h.01M12 4v6M9 7l3 3 3-3"/></svg>',
+    flip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="16" cy="12" r="3" fill="currentColor"/></svg>',
+    night: moon.replace('<svg', '<svg style="width:15px"'),
+    web: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  };
+  if (S.intro) {
+    const loginRow = kit.el('div', 'card intro-item');
+    const li = kit.el('div', 'icon'); li.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>';
+    const lg = kit.el('div', 'grow'); lg.append(kit.el('div', 'title', 'Open at login'), kit.el('div', 'detail', 'Start Nox when you sign in'));
+    loginRow.append(li, lg, kit.sw(S.login, 'Open at login', v => { swLogin.force(v); kit.post('login', { on: v }); }));
+    const howLink = kit.el('button', 'btn', 'Show me how');
+    let wantHow = false;
+    howLink.onclick = () => { wantHow = true; welcome.close(true); };
+    const welcome = kit.intro([
+      { art: moon, app: true, title: 'Welcome to Nox', text: 'Dark mode for your whole PC, one click away.',
+        items: [{ icon: icons.tray, title: 'Lives in the tray', detail: 'Bottom right, next to the clock' },
+                { icon: icons.flip, title: 'One switch', detail: 'Flips every app between light and dark' },
+                { icon: icons.night, title: 'Dark at night', detail: 'Or let it switch by itself at set times' }] },
+      { art: icons.web, title: 'Websites go dark too', text: 'Add the small Chrome or Edge extension and pages follow Windows. It reads nothing and sends nothing.', extra: howLink },
+      { art: icons.check, title: 'You are all set', text: 'Three things worth knowing.',
+        items: [{ icon: icons.flip, title: 'Click the Nox icon', detail: 'In the tray, it flips light and dark at once' },
+                { icon: icons.tray, title: 'Right-click for more', detail: 'A quick switch, and Quit' },
+                { icon: icons.night, title: 'Make it yours', detail: 'Night schedule and the rest are in the panel' }], extra: loginRow },
+    ], { done: 'Start using Nox', onDone: () => {
+      kit.post('introDone');
+      if (wantHow) setTimeout(() => { if (!howOpen) $('howBtn').click(); }, 260);
+    } });
+  }
+})();
+</script>
+</body>
+</html>

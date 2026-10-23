@@ -1,0 +1,526 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		150A30F54C535AB497C39540 /* DarkSwitchExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E5C599640E3277CA6815512F /* DarkSwitchExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		19D602CD98B57AD50D960CB9 /* ChipDrumPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F528C5BBBFF1AA205198A40 /* ChipDrumPicker.swift */; };
+		22C667C610E04D0C54B6699A /* ShareFriend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */; };
+		29DD08C4907E75D93FEC9D8A /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = E7BADA17DD2938566C6AAA54 /* content.js */; };
+		34CCE5BE4C858E96C034E1A9 /* NoxDark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A724A917DD3BC8D833A04B /* NoxDark.swift */; };
+		3B17B4313778B353F0BE9858 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCF39882CF16933AFF21C75 /* Onboarding.swift */; };
+		47BAEF1DBCD1B6B73D6C929D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B79852062EA5205328A1F9 /* Assets.xcassets */; };
+		5CA6AC8C5442211E5F233663 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 47307AD18F15B21D4201A35B /* icon-128.png */; };
+		70CE415002023EBCF9420922 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */; };
+		717BA01B2F8D34A2E6E067A2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = DB0F50D8E618FC6DE56B776B /* manifest.json */; };
+		7F2E8A33F8213DF6690100F9 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */; };
+		8F095EE99E1C4519E2D7952C /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 195D24DFC07FDD050B4A1ED5 /* background.js */; };
+		B3FA02AFA879194E882861E2 /* SafariSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE2AD1A978093D8BFC70D14A /* SafariSetup.swift */; };
+		BACBD07B842461C2772D2264 /* RegistrationCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */; };
+		C28466ADA60B870D30958D43 /* ScreenFade.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8ABD42B987FCF43FA1489D /* ScreenFade.swift */; };
+		CA40E5818BC46827924375B7 /* SmoothSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */; };
+		CBB3A4F8272061E9F91A3E0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EB6BFFF4E022201204AD96 /* AppDelegate.swift */; };
+		FC1C95389C3FA50C1395F07A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5227CD8D69D4E58BDA61B40F /* main.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C5AD2220333575EDC889C7F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C5E7DD5D467C4C62187CAC2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 32084524B1C36BB97250AE02;
+			remoteInfo = DarkSwitchExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		77AE3A10B8E699A497903AC9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				150A30F54C535AB497C39540 /* DarkSwitchExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareFriend.swift; sourceTree = "<group>"; };
+		13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationCleanup.swift; sourceTree = "<group>"; };
+		195D24DFC07FDD050B4A1ED5 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		47307AD18F15B21D4201A35B /* icon-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
+		4E282D52EF3A773E72070DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5227CD8D69D4E58BDA61B40F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
+		67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothSwitch.swift; sourceTree = "<group>"; };
+		68A724A917DD3BC8D833A04B /* NoxDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoxDark.swift; sourceTree = "<group>"; };
+		76EB6BFFF4E022201204AD96 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		86186CFD4E72FC42EC54832A /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		8F528C5BBBFF1AA205198A40 /* ChipDrumPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipDrumPicker.swift; sourceTree = "<group>"; };
+		AE2AD1A978093D8BFC70D14A /* SafariSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariSetup.swift; sourceTree = "<group>"; };
+		B4C19F3315E026D57D9F9BE0 /* DarkSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DarkSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8B79852062EA5205328A1F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CD8ABD42B987FCF43FA1489D /* ScreenFade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenFade.swift; sourceTree = "<group>"; };
+		DB0F50D8E618FC6DE56B776B /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		E5C599640E3277CA6815512F /* DarkSwitchExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DarkSwitchExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7BADA17DD2938566C6AAA54 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		EDCF39882CF16933AFF21C75 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01F3981F256976A47B4D6781 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				47307AD18F15B21D4201A35B /* icon-128.png */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		1211B990C864CAF860105669 /* DarkSwitch */ = {
+			isa = PBXGroup;
+			children = (
+				86186CFD4E72FC42EC54832A /* Signing.xcconfig */,
+			);
+			name = DarkSwitch;
+			path = .;
+			sourceTree = "<group>";
+		};
+		1586DD59024995BDF5E0316F = {
+			isa = PBXGroup;
+			children = (
+				F6027241FC83414EEADAA51F /* App */,
+				1211B990C864CAF860105669 /* DarkSwitch */,
+				8EEB30026DF2028782E19526 /* Extension */,
+				BF82F628BEE3E9F79813B2ED /* Resources */,
+				F3C9953C35A7A0E580E9E549 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8EEB30026DF2028782E19526 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		BF82F628BEE3E9F79813B2ED /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				195D24DFC07FDD050B4A1ED5 /* background.js */,
+				E7BADA17DD2938566C6AAA54 /* content.js */,
+				DB0F50D8E618FC6DE56B776B /* manifest.json */,
+				01F3981F256976A47B4D6781 /* images */,
+			);
+			name = Resources;
+			path = Extension/Resources;
+			sourceTree = "<group>";
+		};
+		F3C9953C35A7A0E580E9E549 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B4C19F3315E026D57D9F9BE0 /* DarkSwitch.app */,
+				E5C599640E3277CA6815512F /* DarkSwitchExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F6027241FC83414EEADAA51F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				76EB6BFFF4E022201204AD96 /* AppDelegate.swift */,
+				C8B79852062EA5205328A1F9 /* Assets.xcassets */,
+				8F528C5BBBFF1AA205198A40 /* ChipDrumPicker.swift */,
+				4E282D52EF3A773E72070DAC /* Info.plist */,
+				5227CD8D69D4E58BDA61B40F /* main.swift */,
+				5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */,
+				68A724A917DD3BC8D833A04B /* NoxDark.swift */,
+				EDCF39882CF16933AFF21C75 /* Onboarding.swift */,
+				13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */,
+				AE2AD1A978093D8BFC70D14A /* SafariSetup.swift */,
+				CD8ABD42B987FCF43FA1489D /* ScreenFade.swift */,
+				0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */,
+				67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		32084524B1C36BB97250AE02 /* DarkSwitchExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 152D0DB4E03A2554EF36F38F /* Build configuration list for PBXNativeTarget "DarkSwitchExtension" */;
+			buildPhases = (
+				84B24EDA9F07DBCD9758AC99 /* Sources */,
+				60CBF59E5C1497FF8A2A9C48 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DarkSwitchExtension;
+			packageProductDependencies = (
+			);
+			productName = DarkSwitchExtension;
+			productReference = E5C599640E3277CA6815512F /* DarkSwitchExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		48931730758A9E4A13A92B30 /* DarkSwitch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF9427234A5556D765FD4917 /* Build configuration list for PBXNativeTarget "DarkSwitch" */;
+			buildPhases = (
+				42556396471B09F8A92EEBD2 /* Sources */,
+				802BFD9B0747A95501611CED /* Resources */,
+				77AE3A10B8E699A497903AC9 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0911EAB91D353598250209E /* PBXTargetDependency */,
+			);
+			name = DarkSwitch;
+			packageProductDependencies = (
+			);
+			productName = DarkSwitch;
+			productReference = B4C19F3315E026D57D9F9BE0 /* DarkSwitch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0C5E7DD5D467C4C62187CAC2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					32084524B1C36BB97250AE02 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					48931730758A9E4A13A92B30 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 2BD6F21C98857780EA447481 /* Build configuration list for PBXProject "DarkSwitch" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1586DD59024995BDF5E0316F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F3C9953C35A7A0E580E9E549 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				48931730758A9E4A13A92B30 /* DarkSwitch */,
+				32084524B1C36BB97250AE02 /* DarkSwitchExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		60CBF59E5C1497FF8A2A9C48 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F095EE99E1C4519E2D7952C /* background.js in Resources */,
+				29DD08C4907E75D93FEC9D8A /* content.js in Resources */,
+				5CA6AC8C5442211E5F233663 /* icon-128.png in Resources */,
+				717BA01B2F8D34A2E6E067A2 /* manifest.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		802BFD9B0747A95501611CED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47BAEF1DBCD1B6B73D6C929D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		42556396471B09F8A92EEBD2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBB3A4F8272061E9F91A3E0A /* AppDelegate.swift in Sources */,
+				19D602CD98B57AD50D960CB9 /* ChipDrumPicker.swift in Sources */,
+				70CE415002023EBCF9420922 /* MainWindow.swift in Sources */,
+				34CCE5BE4C858E96C034E1A9 /* NoxDark.swift in Sources */,
+				3B17B4313778B353F0BE9858 /* Onboarding.swift in Sources */,
+				BACBD07B842461C2772D2264 /* RegistrationCleanup.swift in Sources */,
+				B3FA02AFA879194E882861E2 /* SafariSetup.swift in Sources */,
+				C28466ADA60B870D30958D43 /* ScreenFade.swift in Sources */,
+				22C667C610E04D0C54B6699A /* ShareFriend.swift in Sources */,
+				CA40E5818BC46827924375B7 /* SmoothSwitch.swift in Sources */,
+				FC1C95389C3FA50C1395F07A /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84B24EDA9F07DBCD9758AC99 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F2E8A33F8213DF6690100F9 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C0911EAB91D353598250209E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 32084524B1C36BB97250AE02 /* DarkSwitchExtension */;
+			targetProxy = C5AD2220333575EDC889C7F5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0997FDA645B891FD2366F01A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extension/Extension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.solomon.DarkSwitch.Extension;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		2AF39643EAC1F5B977E36960 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.solomon.DarkSwitch;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A813D6243DEAB688A8BCCCAC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 86186CFD4E72FC42EC54832A /* Signing.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		BA8001FD1440D8D3D58E290F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 86186CFD4E72FC42EC54832A /* Signing.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BC1EF438016AAB9A1A63A71C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Extension/Extension.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Extension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.solomon.DarkSwitch.Extension;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DE1DCD924FEAFE883A97452D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.solomon.DarkSwitch;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		152D0DB4E03A2554EF36F38F /* Build configuration list for PBXNativeTarget "DarkSwitchExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0997FDA645B891FD2366F01A /* Debug */,
+				BC1EF438016AAB9A1A63A71C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2BD6F21C98857780EA447481 /* Build configuration list for PBXProject "DarkSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA8001FD1440D8D3D58E290F /* Debug */,
+				A813D6243DEAB688A8BCCCAC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CF9427234A5556D765FD4917 /* Build configuration list for PBXNativeTarget "DarkSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2AF39643EAC1F5B977E36960 /* Debug */,
+				DE1DCD924FEAFE883A97452D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0C5E7DD5D467C4C62187CAC2 /* Project object */;
+}

@@ -1,0 +1,28 @@
+name: Idea
+description: Suggest an idea for Nox
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nox is deliberately small and private. Ideas that keep it simple, native and offline are very welcome.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the use, not only the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This does not need network access or collect any data.
+          required: false

@@ -1,0 +1,20 @@
+# Build output
+build/
+DerivedData/
+*.xcarchive
+
+# Release artefacts (attach these to a GitHub release instead of committing them)
+release/*.dmg
+release/*.zip
+
+# Xcode per-user state
+xcuserdata/
+*.xcuserstate
+
+# macOS cruft
+.DS_Store
+._*
+
+# Personal signing identity
+Local.xcconfig
+.preview.html
