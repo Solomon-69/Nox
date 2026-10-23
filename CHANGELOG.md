@@ -35,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First-run welcome window that walks through each permission.
 - `make-release.sh`, which builds the app and packs it into `release/Nox.dmg`.
 
-[Unreleased]: https://github.com/Solomon-69/Nox/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Solomon-69/Nox/compare/v1.1...HEAD
+[1.1]: https://github.com/Solomon-69/Nox/releases/tag/v1.1
 [1.0.0]: https://github.com/Solomon-69/Nox/releases/tag/v1.0.0
