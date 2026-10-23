@@ -27,7 +27,7 @@ internal sealed class Settings
 /// </summary>
 internal sealed class NoxApp : ApplicationContext
 {
-    public const string Version = "1.0.0";
+    public const string Version = "1.1.0";
     private const int ScheduleTickMs = 20_000;
     private const int KnobSlideMs = 380;   // the panel's switch spring (.34s) before the screen picture is taken
     private static readonly Color LightBack = Color.FromArgb(0xF3, 0xF0, 0xFE);

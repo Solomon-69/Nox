@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Nox",
-  "version": "1.0.0",
+  "version": "1.1",
   "description": "Turns web pages dark when Nox turns your Mac dark.",
   "icons": {"128": "images/icon-128.png"},
   "permissions": ["nativeMessaging"],
