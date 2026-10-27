@@ -132,12 +132,14 @@ enum ScreenFade {
         view.wantsLayer = true
         view.layerContentsRedrawPolicy = .never
         view.layer?.backgroundColor = tint.cgColor
-        // Cut the menu bar switch out of the veil, so the live switch stays crisp while it slides.
-        if let hole, screen.frame.intersects(hole) {
-            let local = hole.offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY)
+        // Leave the whole menu bar uncovered: macOS changes it with its own cross-fade, and a veil over it with only the
+        // switch cut out left the icon isolated in a box with bars either side while the bar changed look.
+        let barH = screen.frame.maxY - screen.visibleFrame.maxY
+        if barH > 0 || hole != nil {
             let path = CGMutablePath()
             path.addRect(CGRect(origin: .zero, size: screen.frame.size))
-            path.addRect(local)
+            if barH > 0 { path.addRect(CGRect(x: 0, y: screen.frame.height - barH, width: screen.frame.width, height: barH)) }
+            if let hole, screen.frame.intersects(hole) { path.addRect(hole.offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY)) }
             let mask = CAShapeLayer()
             mask.path = path
             mask.fillRule = .evenOdd
