@@ -8,13 +8,15 @@ enum NoxDark {
     /// Read by the Safari extension (shared preference) and the Chrome bridge below.
     static let key = "darkByNox"
     static let forceDarkKey = "forceDark"
+    /// Remembers that the user asked Nox for dark (kept across restarts), so Nox can hold it.
+    static let intentKey = "noxWantsDark"
 
     /// What the extensions should do: darken pages only when the user wants it AND Nox made it dark.
     static func pagesShouldDarken(forceDark: Bool, darkByNox: Bool) -> Bool { forceDark && darkByNox }
 
     /// The new flag after something happens.
     enum Event {
-        case launched                         // Nox started: it did not cause whatever look the Mac has
+        case launched(intentDark: Bool, systemDark: Bool)   // Nox started: pages stay dark only if Nox's dark is still on
         case noxSwitching(toDark: Bool)       // Nox is about to switch (set before, so pages darken in step)
         case noxSwitchFailed                  // the switch did not happen
         case appearanceChanged(byNox: Bool, nowDark: Bool)
@@ -23,10 +25,32 @@ enum NoxDark {
 
     static func next(_ flag: Bool, after event: Event) -> Bool {
         switch event {
-        case .launched, .noxSwitchFailed, .quitting: return false
+        case .launched(let intentDark, let systemDark): return intentDark && systemDark
+        case .noxSwitchFailed, .quitting: return false
         case .noxSwitching(let toDark): return toDark
         case .appearanceChanged(let byNox, let nowDark): return nowDark && byNox && flag
         }
+    }
+
+    /// The user's wish after something happens. A switch to light made outside Nox (Control Centre,
+    /// System Settings, Apple's Auto) is the user's choice, so Nox stops holding dark.
+    static func nextIntent(_ intent: Bool, after event: Event) -> Bool {
+        switch event {
+        case .noxSwitching(let toDark): return toDark
+        case .appearanceChanged(let byNox, let nowDark): return byNox ? intent : (nowDark ? intent : false)
+        case .launched, .noxSwitchFailed, .quitting: return intent
+        }
+    }
+
+    /// True when Nox's dark mode is on but the Mac is light anyway (it changed while Nox was closed,
+    /// asleep, or a notification was missed): Nox puts dark back.
+    static func shouldReassertDark(intentDark: Bool, systemDark: Bool, switching: Bool) -> Bool {
+        intentDark && !systemDark && !switching
+    }
+
+    static var intent: Bool {
+        get { UserDefaults.standard.bool(forKey: intentKey) }
+        set { UserDefaults.standard.set(newValue, forKey: intentKey) }
     }
 
     static var flag: Bool {
@@ -37,7 +61,10 @@ enum NoxDark {
         }
     }
 
-    static func apply(_ event: Event) { flag = next(flag, after: event) }
+    static func apply(_ event: Event) {
+        intent = nextIntent(intent, after: event)
+        flag = next(flag, after: event)
+    }
 
     static var pagesShouldDarkenNow: Bool {
         let d = UserDefaults.standard

@@ -19,7 +19,6 @@ Installing Nox
 3. A welcome window opens. Click each button and press Allow on Apple's windows:
    - Switch dark mode (lets Nox change light/dark)
    - Dark websites in Safari (opens Safari's extension settings)
-   - Smooth fade (optional, needs Screen Recording)
 4. Nox lives in the menu bar: click the switch to flip dark mode,
    right-click it (or Option-click) for options.
 TXT

@@ -5,8 +5,6 @@ import SwiftUI
 struct SetupActions {
     let automationGranted: () -> Bool?
     let requestAutomation: () async -> Bool
-    let screenGranted: () -> Bool
-    let requestScreen: () -> Void
     let openSafari: () -> Void
     let setLogin: (Bool) -> Void
 }
@@ -88,7 +86,6 @@ private struct OnboardingContent: View {
     @State private var seen: Set<Int> = []        // pages whose rise-in already played; it never replays
     @State private var forward = true
     @State private var automation: Bool?
-    @State private var screen = false
     @State private var asking = false
     @State private var shown = false
     private static let pages = 3
@@ -121,13 +118,11 @@ private struct OnboardingContent: View {
         .noFocusRing()
         .onAppear {
             automation = setup.automationGranted()
-            screen = setup.screenGranted()
             seen.insert(page)
             shown = true
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             automation = setup.automationGranted()
-            screen = setup.screenGranted()
         }
     }
 
@@ -183,7 +178,7 @@ private struct OnboardingContent: View {
     private var permissions: some View {
         VStack(spacing: 10) {
             VStack(spacing: 6) {
-                Text("Three quick steps")
+                Text("Two quick steps")
                     .font(.system(size: 22, weight: .semibold, design: .rounded)).foregroundStyle(theme.text).rise(0, shown)
                 Text("Each button shows Apple's own Allow window.")
                     .font(.system(size: 12)).foregroundStyle(theme.dim).rise(1, shown)
@@ -206,12 +201,9 @@ private struct OnboardingContent: View {
             step(2, "Dark websites in Safari", "Turn on the Nox extension in Safari. " + SafariSetup.shortHint + ".",
                  done: model.extensionOn == true, button: "Turn on") { setup.openSafari() }
                 .rise(3, shown)
-            step(3, "Smooth fade (optional)", "Fades every app like the wallpaper. Needs Screen Recording.",
-                 done: screen, button: "Allow") {
-                setup.requestScreen()
-                screen = setup.screenGranted()
-            }
-            .rise(4, shown)
+            tip("circle.lefthalf.filled", "Works best with Auto apps",
+                "Nox works best when most apps use Auto/System appearance.")
+                .rise(4, shown)
             HStack(spacing: 12) {
                 Image(systemName: "power").foregroundStyle(theme.violet).frame(width: 28)
                 Text("Open at login").font(.system(size: 13, weight: .medium)).foregroundStyle(theme.text)

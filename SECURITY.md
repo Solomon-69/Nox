@@ -20,8 +20,8 @@ the release notes.
 - The Safari extension is sandboxed. It asks the app one yes or no question (is "Websites
   follow your Mac" on?) and never sends a page address or page content to the app.
 - The Chrome extension has no background script and does not talk to the app.
-- On Mac it uses Automation (System Events) only to switch light and dark. Screen Recording is
-  optional and only used for the smooth fade, with the picture kept in memory and never saved.
+- On Mac it uses Automation (System Events) only to switch light and dark. It never asks for
+  Screen Recording and never captures the screen.
 - The extensions run a script on every page because they must read the page's own colours.
   That script runs inside your browser and sends nothing anywhere.
 

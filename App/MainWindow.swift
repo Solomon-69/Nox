@@ -10,7 +10,6 @@ final class DarkSwitchModel: ObservableObject {
     @Published var showInDock = false
     @Published var openCount = 0   // bumped on every panel open, drives the entrance spring
     @Published var smoothFade = false
-    @Published var fadeReady = false        // Screen Recording allowed (the fade needs it)
     @Published var nightSchedule = false
     @Published var darkAt = 20 * 60         // minutes after midnight
     @Published var lightAt = 7 * 60
@@ -21,7 +20,6 @@ final class DarkSwitchModel: ObservableObject {
     var setOpenAtLogin: (Bool) -> Void = { _ in }
     var setShowInDock: (Bool) -> Void = { _ in }
     var setSmoothFade: (Bool) -> Void = { _ in }
-    var allowFade: () -> Void = {}
     var setNightSchedule: (Bool) -> Void = { _ in }
     var setTimes: (Int, Int) -> Void = { _, _ in }
     var openSettings: () -> Void = {}
@@ -143,13 +141,8 @@ private struct MainContent: View {
                            isOn: Binding(get: { model.nightSchedule }, set: { model.setNightSchedule($0) }))
                 if model.nightSchedule { timesRow }
                 SettingRow(icon: "wand.and.rays", title: "Smooth fade",
-                           detail: model.smoothFade && !model.fadeReady
-                               ? "Needs Screen Recording: click Allow below"
-                               : "Fades every open app, like the wallpaper",
+                           detail: "Softens the switch across every open app",
                            isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) }))
-                if model.smoothFade && !model.fadeReady {
-                    Button("Allow Screen Recording") { model.allowFade() }.buttonStyle(PillButtonStyle())
-                }
                 SettingRow(icon: "power", title: "Open at login",
                            detail: "Start Nox when your Mac starts",
                            isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) }))
@@ -521,12 +514,7 @@ private struct QuickPanelContent: View {
                          isOn: model.nightSchedule) { model.setNightSchedule($0) }
                 Divider().opacity(0.4)
                 PanelRow(icon: "wand.and.rays", title: "Smooth fade",
-                         detail: model.smoothFade && !model.fadeReady ? "Needs Screen Recording" : nil,
                          isOn: model.smoothFade) { model.setSmoothFade($0) }
-                if model.smoothFade && !model.fadeReady {
-                    HStack { Spacer(); Button("Allow") { model.allowFade() }.buttonStyle(PillButtonStyle()) }
-                        .padding(.bottom, 8)
-                }
                 Divider().opacity(0.4)
                 PanelRow(icon: "power", title: "Open at login", isOn: model.openAtLogin) { model.setOpenAtLogin($0) }
                 Divider().opacity(0.4)
@@ -552,19 +540,23 @@ private struct QuickPanelContent: View {
             }
             .frame(minHeight: 30)
             .modifier(CardStyle())
-            HStack {
+            // Three equal columns: Share sits in the exact centre, under the arrow.
+            HStack(spacing: 0) {
                 Button(action: openApp) {
                     Label("Settings", systemImage: "gearshape")
                 }
                 .buttonStyle(.plain)
                 .font(.system(size: 12, weight: .medium)).foregroundStyle(theme.violet)
-                Spacer()
+                .frame(maxWidth: .infinity)
                 NoxShareLink()
-                Spacer()
-                Button("Quit", action: quit).buttonStyle(.plain)
-                    .font(.system(size: 12)).foregroundStyle(theme.dim)
+                    .frame(maxWidth: .infinity)
+                Button(action: quit) {
+                    Label("Quit", systemImage: "power")
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 12, weight: .medium)).foregroundStyle(theme.dim)
+                .frame(maxWidth: .infinity)
             }
-            .padding(.horizontal, 4)
         }
         .padding(16)
         .frame(width: 300)

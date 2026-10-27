@@ -55,7 +55,7 @@ described in the README.
 
 - [ ] Set `MARKETING_VERSION` (and bump `CURRENT_PROJECT_VERSION`) in `project.yml`
 - [ ] Move the `[Unreleased]` notes in `CHANGELOG.md` under the new version heading
-- [ ] Tag and push: `git tag v1.1 && git push public v1.1`
+- [ ] Tag and push: `git tag v1.0.1 && git push public v1.0.1`
 - [ ] Check the release has `Nox.dmg`, `Nox-mac.zip`, `Nox-windows.zip` and `SHA256SUMS.txt`
 - [ ] On a second Mac: install from the dmg, open it, flip dark and light, follow the Safari steps and check a bright page goes dark
 - [ ] On a Windows PC: unzip, run `Nox.exe`, flip the theme from the tray icon

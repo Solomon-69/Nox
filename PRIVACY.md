@@ -32,9 +32,8 @@ make no web requests, have no analytics, no crash reporting and no accounts.
 ## Permissions Nox asks for
 
 - **Automation (System Events):** used only to switch macOS between light and dark mode.
-- **Screen Recording (optional, only for Smooth fade):** used to take one still picture of the
-  screen at the moment of switching, so Nox can fade from the old look to the new one. The
-  picture stays in memory, is thrown away when the fade ends, and is never saved or sent.
+- **No Screen Recording:** the smooth fade is a plain coloured veil drawn by Nox. Nox never
+  looks at, captures or records your screen.
 - **Mouse position and clicks:** Nox watches pointer movement to know when the pointer is over
   its menu bar icon, and watches clicks while its panel is open so it can close the panel when
   you click elsewhere. It does not record or store any of this.

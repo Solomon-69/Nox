@@ -31,7 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         RegistrationCleanup.runInBackground()
         UserDefaults.standard.register(defaults: [forceDarkKey: true, darkAtKey: 20 * 60, lightAtKey: 7 * 60])
         // Whatever look the Mac has right now was not set by this run of Nox, so web pages stay stock.
-        NoxDark.apply(.launched)
+        NoxDark.apply(.launched(intentDark: NoxDark.intent, systemDark: systemIsDark))
         ChromeBridge.register()
         wireModel()
         applyDockPolicy()
@@ -66,6 +66,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         NotificationCenter.default.addObserver(
             self, selector: #selector(refreshExtensionState),
             name: NSApplication.didBecomeActiveNotification, object: nil)
+        // Keep dark on everywhere while Nox's dark is on: check again whenever an app opens,
+        // the Mac wakes, or you log back in.
+        let ws = NSWorkspace.shared.notificationCenter
+        ws.addObserver(self, selector: #selector(appLaunched(_:)), name: NSWorkspace.didLaunchApplicationNotification, object: nil)
+        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] {
+            ws.addObserver(self, selector: #selector(keepDarkAfterWake), name: name, object: nil)
+        }
+        warmUpSystemEvents()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.keepDark(reason: "launch") }
+    }
+
+    // MARK: Keep dark on
+
+    /// Puts dark mode back if Nox's dark is on but the Mac went light behind its back.
+    private func keepDark(reason: String) {
+        let sys = systemIsDark
+        guard NoxDark.shouldReassertDark(intentDark: NoxDark.intent, systemDark: sys, switching: isSwitching) else {
+            dlog("keepdark(\(reason)): ok intent=\(NoxDark.intent) systemDark=\(sys) pagesDark=\(NoxDark.flag)")
+            return
+        }
+        dlog("keepdark(\(reason)): Mac is light but Nox dark is on: switching back to dark")
+        toggleMacDark(fade: false)
+    }
+
+    @objc private func keepDarkAfterWake() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in self?.keepDark(reason: "wake") }
+    }
+
+    @objc private func appLaunched(_ note: Notification) {
+        let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+        if let id = app?.bundleIdentifier,
+           (CFPreferencesCopyAppValue("NSRequiresAquaSystemAppearance" as CFString, id as CFString) as? Bool) == true {
+            // That app forces itself light with its own setting; macOS lets it, Nox can't override it.
+            dlog("keepdark: \(id) is set to stay light by its own setting")
+        }
+        keepDark(reason: "app \(app?.bundleIdentifier ?? "?")")
+    }
+
+    /// The first "tell System Events" after login starts System Events, which can take seconds and
+    /// made the first click seem to do nothing. Start it quietly now (only once permission exists,
+    /// so this never shows Apple's prompt by surprise).
+    private func warmUpSystemEvents() {
+        guard Permissions.automationState() == true else { return }
+        Self.scriptQueue.async {
+            var error: NSDictionary?
+            NSAppleScript(source: "tell application \"System Events\" to get dark mode of appearance preferences")?
+                .executeAndReturnError(&error)
+            dlog("warmup: System Events \(error == nil ? "ready" : "error \(error!)")")
+        }
     }
 
     /// Opening the app again (Finder, Spotlight, Launchpad) shows the window.
@@ -81,7 +130,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     private static let longPressDelay: TimeInterval = 0.4
 
     @objc private func statusClicked() {
-        guard let event = NSApp.currentEvent else { return }
+        guard let event = NSApp.currentEvent else { dlog("click: no event"); return }
+        dlog("click: \(event.type.rawValue) panel=\(panelIsShown) switching=\(isSwitching) held=\(longPressFired)")
         switch event.type {
         case .rightMouseUp:
             cancelHold()
@@ -260,7 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         menu.autoenablesItems = false
 
         darkItem.title = "Dark mode"
-        darkItem.action = #selector(toggleMacDark)
+        darkItem.action = #selector(toggleMacDark as () -> Void)
         darkItem.target = self
 
         forceItem.title = "Websites follow Mac"
@@ -316,13 +366,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         SetupActions(
             automationGranted: { Permissions.automationState() },
             requestAutomation: { await Permissions.requestAutomation() },
-            screenGranted: { CGPreflightScreenCaptureAccess() },
-            requestScreen: {
-                UserDefaults.standard.set(true, forKey: smoothFadeKey)
-                if !CGRequestScreenCaptureAccess() {
-                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
-                }
-            },
             openSafari: { [weak self] in self?.openExtensionSettings() },
             setLogin: { [weak self] on in self?.setOpenAtLogin(on) })
     }
@@ -407,7 +450,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.setOpenAtLogin = { [weak self] on in self?.setOpenAtLogin(on) }
         model.setShowInDock = { [weak self] on in self?.setShowInDock(on) }
         model.setSmoothFade = { [weak self] on in self?.setSmoothFade(on) }
-        model.allowFade = { [weak self] in self?.allowFade() }
         model.setNightSchedule = { [weak self] on in self?.setNightSchedule(on) }
         model.setTimes = { [weak self] dark, light in self?.setTimes(dark: dark, light: light) }
         model.openSettings = { [weak self] in self?.closePanel(); self?.showWindow() }
@@ -420,7 +462,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.openAtLogin = SMAppService.mainApp.status == .enabled
         model.showInDock = d.bool(forKey: showInDockKey)
         model.smoothFade = d.bool(forKey: smoothFadeKey)
-        model.fadeReady = CGPreflightScreenCaptureAccess()
         model.nightSchedule = d.bool(forKey: scheduleKey)
         model.darkAt = d.integer(forKey: darkAtKey)
         model.lightAt = d.integer(forKey: lightAtKey)
@@ -627,8 +668,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         }
     }
 
-    @objc private func toggleMacDark() {
-        guard !isSwitching else { return }
+    @objc private func toggleMacDark() { toggleMacDark(fade: true) }
+
+    private func toggleMacDark(fade: Bool) {
+        // A press while the last switch is still finishing is kept and run right after, never dropped.
+        guard !isSwitching else { queuedToggle = true; dlog("switch: busy, press queued"); return }
         isSwitching = true
         let wantDark = !systemIsDark
         pendingDark = wantDark
@@ -638,7 +682,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         // under the still picture.
         // (A switch that worked before proves permission too: Apple's check can answer "not sure".)
         let allowed = Permissions.automationState() == true || UserDefaults.standard.bool(forKey: "switchWorked")
-        let fading = UserDefaults.standard.bool(forKey: smoothFadeKey) && allowed
+        let fading = fade && UserDefaults.standard.bool(forKey: smoothFadeKey) && allowed
         dlog("fade: wanted=\(UserDefaults.standard.bool(forKey: smoothFadeKey)) allowed=\(allowed)")
         let barIsDark = statusItem.button?.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         // Slide the menu bar switch and update the panel's title at the same moment as its switch.
@@ -668,6 +712,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             }
             if !ok {
                 NoxDark.apply(.noxSwitchFailed)
+                NoxDark.intent = !wantDark
                 self.pendingDark = nil
                 self.animateIcon(to: wantDark ? 0 : 1)
                 self.model.isDark = !wantDark
@@ -680,11 +725,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
                 self.isSwitching = false
                 self.pendingDark = nil
                 self.refreshState()
+                if self.queuedToggle { self.queuedToggle = false; self.toggleMacDark(fade: true) }
             }
         }
     }
 
     private var isSwitching = false
+    private var queuedToggle = false
     /// System Events hung (not a permission problem): don't show the permission alert.
     private var lastSwitchTimedOut = false
     private static let knobSlideTime: CFTimeInterval = 0.36
@@ -826,17 +873,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     private func setSmoothFade(_ on: Bool) {
         UserDefaults.standard.set(on, forKey: smoothFadeKey)
         model.smoothFade = on
-        if on, !CGPreflightScreenCaptureAccess() { allowFade() }
-    }
-
-    /// Shows Apple's Screen Recording prompt, or opens the right page in System Settings if it
-    /// was answered before.
-    private func allowFade() {
-        if !CGRequestScreenCaptureAccess() {
-            closePanel()
-            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
-        }
-        model.fadeReady = CGPreflightScreenCaptureAccess()
     }
 
     // MARK: Dark at night

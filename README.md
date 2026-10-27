@@ -7,7 +7,7 @@
 <p><b>One click flips your Mac between light and dark. Websites go dark with it.</b></p>
 
 <p>
-  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Version 1.1" src="https://img.shields.io/badge/version-1.1-7C3AED?style=flat-square"></a>
+  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Version 1.0.2" src="https://img.shields.io/badge/version-1.0.2-7C3AED?style=flat-square"></a>
   <img alt="macOS 13 or later" src="https://img.shields.io/badge/macOS-13%2B-1f1d1a?style=flat-square&logo=apple&logoColor=white">
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white">
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-5b8a5a?style=flat-square"></a>
@@ -102,16 +102,6 @@ window. Nox is small and native, with no account, no network access and no helpe
 background. A Windows tray version and a Chrome and Edge extension follow the same ideas.
 
 
-## Welcome window
-
-<p align="center">
-  <img src="docs/intro/nox-welcome-1.png" width="270" alt="Nox welcome, page one">
-  <img src="docs/intro/nox-welcome-2.png" width="270" alt="Nox welcome, page two">
-  <img src="docs/intro/nox-welcome-3.png" width="270" alt="Nox welcome, page three">
-</p>
-
-Version 1.1 has a new three-page welcome with a frosted glass panel. Each page plays its animation once.
-
 ## Install on Mac
 
 1. Download **Nox.dmg** (or the zip) from the [latest release](https://github.com/Solomon-69/Nox/releases/latest).
@@ -120,7 +110,7 @@ Version 1.1 has a new three-page welcome with a frosted glass panel. Each page p
 4. A welcome window walks you through the permissions. Click each button and press **Allow** on Apple's prompts:
    - **Switch dark mode** lets Nox change light and dark (macOS calls this Automation for System Events).
    - **Dark websites in Safari** opens Safari's extension settings (see below).
-   - **Smooth fade** is optional and needs Screen Recording permission.
+   - A tip: Nox works best when most apps use Auto/System appearance.
 
 **First launch on a build that is not notarised.** If a release is not notarised by Apple,
 macOS asks before opening it the first time:
@@ -198,11 +188,10 @@ tells macOS to forget other copies each time it starts. Quit and reopen Nox, or 
 </details>
 
 <details>
-<summary><b>Why does it ask for Automation and Screen Recording?</b></summary>
+<summary><b>Why does it ask for Automation?</b></summary>
 
-Automation (System Events) is how Nox switches light and dark. Screen Recording is only for the
-optional smooth fade: Nox takes one still picture at the moment of switching so it can fade from
-the old look to the new one. The picture stays in memory and is never saved or sent.
+Automation (System Events) is how Nox switches light and dark. That is the only permission it
+asks for. It never needs Screen Recording: the smooth fade is a plain veil Nox draws itself.
 </details>
 
 <details>
@@ -277,16 +266,3 @@ go through [SECURITY.md](SECURITY.md), not public issues.
 ## Licence
 
 [MIT](LICENSE). Copyright (c) 2026 Solomon.
-
-## Unsigned apps: how to open them, and how to check your download
-
-These apps are not signed yet. Signing needs Apple's paid developer account (and a Windows code-signing certificate), which the project does not have yet. The apps are safe to use as far as the author knows, but your computer cannot prove who made them, so it warns you the first time.
-
-- **Mac:** right-click the app, choose **Open**, then **Open** again. If there is no Open button, go to System Settings > Privacy & Security and click **Open Anyway**.
-- **Windows:** if SmartScreen says "Windows protected your PC", click **More info**, then **Run anyway**.
-
-To check that a download has not been changed, compare its SHA-256 fingerprint with the one in [CHECKSUMS.md](CHECKSUMS.md) (Mac: `shasum -a 256 <file>` in Terminal; Windows: `certutil -hashfile <file> SHA256`).
-
-## Trademarks
-
-Nox is an independent project. Apple, Safari, Mac and macOS are trademarks of Apple Inc.; Chrome is a trademark of Google LLC; Windows is a trademark of Microsoft Corporation. Not affiliated with or endorsed by them.

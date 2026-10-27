@@ -5,7 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1] - 2026-10-23
+## [1.0.2] - 2026-10-27
+
+### Fixed
+- Nox never asks for Screen Recording any more: the smooth fade is now a soft veil Nox draws itself, and the Allow buttons are gone.
+- Every click on the menu bar switch counts: a click during a switch is queued, and System Events is started early so the first click works.
+- Dark mode stays on while Nox's dark is on: checked again when apps open, the Mac wakes, and Nox restarts.
+- Settings, Share and Quit sit in three equal columns at the bottom of the panel, with Share centred.
+
+### Added
+- Welcome tip: Nox works best when most apps use Auto/System appearance.
+
+## [1.0.1] - 2026-10-23
 
 ### Changed
 - New welcome: three pages (what Nox does, the permissions, three tips), frosted glass panel on a plain soft backdrop, logo centred.
@@ -35,6 +46,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First-run welcome window that walks through each permission.
 - `make-release.sh`, which builds the app and packs it into `release/Nox.dmg`.
 
-[Unreleased]: https://github.com/Solomon-69/Nox/compare/v1.1...HEAD
-[1.1]: https://github.com/Solomon-69/Nox/releases/tag/v1.1
+[Unreleased]: https://github.com/Solomon-69/Nox/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/Solomon-69/Nox/releases/tag/v1.0.0
