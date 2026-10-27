@@ -690,16 +690,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.isDark = wantDark
         let started = CACurrentMediaTime()
         Task { @MainActor in
-            let overlays = fading ? await ScreenFade.freezeScreens(keepLive: self.statusItem.button?.window?.frame) : []
-            // The bar behind the icon stays frozen in the old look until the fade, so the icon keeps
-            // its current colour until then instead of flipping early (only when there is a picture).
-            if !overlays.isEmpty { self.iconColorOverride = barIsDark ? .white : .black }
             // macOS freezes and cross-fades the whole menu bar while it changes look, which caught
             // the knob mid-slide (two ghost knobs). Let the knob finish its slide first.
             let waited = CACurrentMediaTime() - started
             if waited < Self.knobSlideTime {
                 try? await Task.sleep(nanoseconds: UInt64((Self.knobSlideTime - waited) * 1_000_000_000))
             }
+            // Then veil the whole screen, menu bar and icon included, so everything fades as one
+            // (a live cut-out around the icon showed as a dark box while the rest faded).
+            let overlays = fading ? await ScreenFade.freezeScreens(keepLive: nil) : []
+            // The bar behind the icon stays in the old look until the fade, so the icon keeps
+            // its current colour until then instead of flipping early (only when there is a picture).
+            if !overlays.isEmpty { self.iconColorOverride = barIsDark ? .white : .black }
             let ok = await self.switchAppearance(dark: wantDark)
             if ok { UserDefaults.standard.set(true, forKey: "switchWorked") }
             // macOS repaints a moment after it says yes: keep the picture up until it really has.
