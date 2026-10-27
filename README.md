@@ -191,7 +191,8 @@ tells macOS to forget other copies each time it starts. Quit and reopen Nox, or 
 <summary><b>Why does it ask for Automation?</b></summary>
 
 Automation (System Events) is how Nox switches light and dark. That is the only permission it
-asks for. It never needs Screen Recording: the smooth fade is a plain veil Nox draws itself.
+asks for. It never needs Screen Recording: the smooth fade is done by macOS itself, and Nox never
+sees your screen.
 </details>
 
 <details>

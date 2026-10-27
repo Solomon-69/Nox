@@ -450,10 +450,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.setOpenAtLogin = { [weak self] on in self?.setOpenAtLogin(on) }
         model.setShowInDock = { [weak self] on in self?.setShowInDock(on) }
         model.setSmoothFade = { [weak self] on in self?.setSmoothFade(on) }
-        // Opens Privacy & Security > Screen Recording only when the button is pressed; never asks by itself.
-        model.openScreenRecordingSettings = {
-            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
-        }
         model.setNightSchedule = { [weak self] on in self?.setNightSchedule(on) }
         model.setTimes = { [weak self] dark, light in self?.setTimes(dark: dark, light: light) }
         model.openSettings = { [weak self] in self?.closePanel(); self?.showWindow() }
@@ -466,7 +462,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.openAtLogin = SMAppService.mainApp.status == .enabled
         model.showInDock = d.bool(forKey: showInDockKey)
         model.smoothFade = d.bool(forKey: smoothFadeKey)
-        model.screenRecordingOK = ScreenFade.pictureAllowed
         model.nightSchedule = d.bool(forKey: scheduleKey)
         model.darkAt = d.integer(forKey: darkAtKey)
         model.lightAt = d.integer(forKey: lightAtKey)
@@ -543,7 +538,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     }
 
     @objc private func refreshExtensionState() {
-        model.screenRecordingOK = ScreenFade.pictureAllowed   // you may have just allowed it in Settings
         checkExtension(triesLeft: 4)
     }
 
@@ -668,9 +662,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             }
         case "fadetest":
             Task { @MainActor in
-                let o = await ScreenFade.freezeScreens()
+                _ = await ScreenFade.freezeScreens()
                 try? await Task.sleep(nanoseconds: 800_000_000)
-                ScreenFade.fadeOut(o)
+                ScreenFade.fadeOut()
             }
         default: break
         }
@@ -687,7 +681,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         // Noted before the switch, so pages darken together with the Mac.
         NoxDark.apply(.noxSwitching(toDark: wantDark))
         // Only fade once switching is allowed; otherwise Apple's permission window would be hidden
-        // under the still picture.
+        // under the fade.
         // (A switch that worked before proves permission too: Apple's check can answer "not sure".)
         let allowed = Permissions.automationState() == true || UserDefaults.standard.bool(forKey: "switchWorked")
         let fading = fade && UserDefaults.standard.bool(forKey: smoothFadeKey) && allowed
@@ -704,20 +698,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             if waited < Self.knobSlideTime {
                 try? await Task.sleep(nanoseconds: UInt64((Self.knobSlideTime - waited) * 1_000_000_000))
             }
-            // Then cover the whole screen, menu bar and icon included, so everything fades as one
-            // (a live cut-out around the icon showed as a dark box while the rest faded): a still
-            // picture when Screen Recording is already allowed, otherwise the plain veil.
-            let overlays = fading ? await ScreenFade.freezeScreens(keepLive: nil) : []
-            // The bar behind the icon stays in the old look until the fade, so the icon keeps
-            // its current colour until then instead of flipping early (only when there is a picture).
-            if !overlays.isEmpty { self.iconColorOverride = barIsDark ? .white : .black }
+            // Then the whole screen, menu bar and icon included, fades as one: macOS's own
+            // cross-fade (no Screen Recording, Nox never sees the screen), otherwise a soft veil.
+            let faded = fading ? await ScreenFade.freezeScreens() : false
+            // Under the veil the bar behind the icon stays in the old look until the fade, so the
+            // icon keeps its current colour until then. (The cross-fade holds the screen itself.)
+            if faded, ScreenFade.isVeil { self.iconColorOverride = barIsDark ? .white : .black }
             let ok = await self.switchAppearance(dark: wantDark)
             if ok { UserDefaults.standard.set(true, forKey: "switchWorked") }
-            // macOS repaints a moment after it says yes: keep the picture up until it really has.
-            if ok, !overlays.isEmpty { await ScreenFade.waitForRepaint(dark: wantDark, overlays: overlays) }
-            ScreenFade.fadeOut(overlays)
+            // macOS repaints a moment after it says yes: keep the screen held until it really has.
+            if ok, faded { await ScreenFade.waitForRepaint(dark: wantDark) }
+            ScreenFade.fadeOut()
             // Halfway through the fade, hand the icon back to the system colour of the new bar.
-            DispatchQueue.main.asyncAfter(deadline: .now() + (overlays.isEmpty ? 0 : 0.45)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + (faded ? 0.25 : 0)) {
                 self.iconColorOverride = nil
                 self.setIcon(progress: self.iconProgress)
             }
@@ -727,7 +720,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
                 self.pendingDark = nil
                 self.animateIcon(to: wantDark ? 0 : 1)
                 self.model.isDark = !wantDark
-                if !self.lastSwitchTimedOut { DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {   // after the picture is gone
+                if !self.lastSwitchTimedOut { DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {   // after the fade is gone
                     self.alert("Nox needs permission to switch dark mode",
                                "Open System Settings, Privacy & Security, Automation, and allow Nox to control System Events. Then try again.")
                 } }
@@ -756,7 +749,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         tell application "System Events" to tell appearance preferences to set dark mode to \(dark ? "true" : "false")
         """
         // If System Events hangs (it sometimes does while other apps use it), give up after a few
-        // seconds instead of waiting forever: a still picture left on screen would freeze the Mac.
+        // seconds instead of waiting forever: a held screen would look frozen.
         lastSwitchTimedOut = false
         let failed: Bool = await withCheckedContinuation { done in
             let once = OnceFlag()

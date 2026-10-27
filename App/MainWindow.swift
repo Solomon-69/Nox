@@ -10,8 +10,6 @@ final class DarkSwitchModel: ObservableObject {
     @Published var showInDock = false
     @Published var openCount = 0   // bumped on every panel open, drives the entrance spring
     @Published var smoothFade = false
-    /// Screen Recording already allowed (only checked, never asked for): picture fade instead of veil.
-    @Published var screenRecordingOK = true
     @Published var nightSchedule = false
     @Published var darkAt = 20 * 60         // minutes after midnight
     @Published var lightAt = 7 * 60
@@ -22,7 +20,6 @@ final class DarkSwitchModel: ObservableObject {
     var setOpenAtLogin: (Bool) -> Void = { _ in }
     var setShowInDock: (Bool) -> Void = { _ in }
     var setSmoothFade: (Bool) -> Void = { _ in }
-    var openScreenRecordingSettings: () -> Void = {}
     var setNightSchedule: (Bool) -> Void = { _ in }
     var setTimes: (Int, Int) -> Void = { _, _ in }
     var openSettings: () -> Void = {}
@@ -104,7 +101,7 @@ extension NoxTheme {
 }
 
 /// While the smooth fade runs, Nox's own windows take their colours from the fade's clock
-/// (same start, length and easing as the picture fading over every other app), so the whole
+/// (same start, length and easing as the veil fading over every other app), so the whole
 /// screen changes as one. The rest of the time this is nil and Nox simply follows the Mac.
 final class NoxLook: ObservableObject {
     static let shared = NoxLook()
@@ -146,7 +143,6 @@ private struct MainContent: View {
                 SettingRow(icon: "wand.and.rays", title: "Smooth fade",
                            detail: "Softens the switch across every open app",
                            isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) }))
-                if model.smoothFade && !model.screenRecordingOK { screenRecordingRow }
                 SettingRow(icon: "power", title: "Open at login",
                            detail: "Start Nox when your Mac starts",
                            isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) }))
@@ -233,19 +229,6 @@ private struct MainContent: View {
         withAnimation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.82)) {
             editingLight = light
         }
-    }
-
-    /// Only shown when Screen Recording is off; the button just opens the right Settings page.
-    private var screenRecordingRow: some View {
-        HStack(spacing: 12) {
-            Text("For the smoothest fade, allow Nox in Screen Recording")
-                .font(.system(size: 11)).foregroundStyle(theme.dim)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer()
-            Button("Open Settings") { model.openScreenRecordingSettings() }
-                .buttonStyle(PillButtonStyle())
-        }
-        .padding(.horizontal, 14)
     }
 
     private var extensionRow: some View {
