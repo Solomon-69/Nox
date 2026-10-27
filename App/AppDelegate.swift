@@ -450,6 +450,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.setOpenAtLogin = { [weak self] on in self?.setOpenAtLogin(on) }
         model.setShowInDock = { [weak self] on in self?.setShowInDock(on) }
         model.setSmoothFade = { [weak self] on in self?.setSmoothFade(on) }
+        // Opens Privacy & Security > Screen Recording only when the button is pressed; never asks by itself.
+        model.openScreenRecordingSettings = {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+        }
         model.setNightSchedule = { [weak self] on in self?.setNightSchedule(on) }
         model.setTimes = { [weak self] dark, light in self?.setTimes(dark: dark, light: light) }
         model.openSettings = { [weak self] in self?.closePanel(); self?.showWindow() }
@@ -462,6 +466,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         model.openAtLogin = SMAppService.mainApp.status == .enabled
         model.showInDock = d.bool(forKey: showInDockKey)
         model.smoothFade = d.bool(forKey: smoothFadeKey)
+        model.screenRecordingOK = ScreenFade.pictureAllowed
         model.nightSchedule = d.bool(forKey: scheduleKey)
         model.darkAt = d.integer(forKey: darkAtKey)
         model.lightAt = d.integer(forKey: lightAtKey)
@@ -537,7 +542,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         statusItem.button?.image?.accessibilityDescription = progress >= 0.5 ? "Nox: dark" : "Nox: light"
     }
 
-    @objc private func refreshExtensionState() { checkExtension(triesLeft: 4) }
+    @objc private func refreshExtensionState() {
+        model.screenRecordingOK = ScreenFade.pictureAllowed   // you may have just allowed it in Settings
+        checkExtension(triesLeft: 4)
+    }
 
     /// Asks Safari whether the extension is on. Safari sometimes can't answer for a moment (busy,
     /// just reinstalled), so a failed check is retried a few times instead of leaving "Checking".
@@ -696,8 +704,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             if waited < Self.knobSlideTime {
                 try? await Task.sleep(nanoseconds: UInt64((Self.knobSlideTime - waited) * 1_000_000_000))
             }
-            // Then veil the whole screen, menu bar and icon included, so everything fades as one
-            // (a live cut-out around the icon showed as a dark box while the rest faded).
+            // Then cover the whole screen, menu bar and icon included, so everything fades as one
+            // (a live cut-out around the icon showed as a dark box while the rest faded): a still
+            // picture when Screen Recording is already allowed, otherwise the plain veil.
             let overlays = fading ? await ScreenFade.freezeScreens(keepLive: nil) : []
             // The bar behind the icon stays in the old look until the fade, so the icon keeps
             // its current colour until then instead of flipping early (only when there is a picture).

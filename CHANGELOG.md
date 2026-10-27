@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4] - 2026-10-27
+
+### Changed
+- The light/dark fade is back to the prettier picture version: when Nox is allowed in Screen Recording, a still picture of the whole screen, menu bar included, fades smoothly into the new look.
+- Without Screen Recording, Nox uses the plain soft fade as before. Nox never asks for Screen Recording by itself; Settings shows one line with a button to open the right page if you want the smoothest fade.
+
 ## [1.3.3] - 2026-10-27
 
 ### Fixed
