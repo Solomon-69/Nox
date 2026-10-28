@@ -7,7 +7,7 @@
 <p><b>One click flips your Mac between light and dark. Websites go dark with it.</b></p>
 
 <p>
-  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Version 1.4.1" src="https://img.shields.io/badge/version-1.0.2-7C3AED?style=flat-square"></a>
+  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Version 1.4.1" src="https://img.shields.io/badge/version-1.4.1-7C3AED?style=flat-square"></a>
   <img alt="macOS 13 or later" src="https://img.shields.io/badge/macOS-13%2B-1f1d1a?style=flat-square&logo=apple&logoColor=white">
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white">
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-5b8a5a?style=flat-square"></a>
