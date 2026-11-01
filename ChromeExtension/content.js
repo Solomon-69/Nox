@@ -16,14 +16,20 @@
   function isPhoto(el) {
     const w = el.clientWidth || el.offsetWidth, h = el.clientHeight || el.offsetHeight;
     if (w < MIN_PHOTO_PX || h < MIN_PHOTO_PX) return false;
+    // Google Docs, Sheets and Slides draw the document itself on a canvas: it must go dark with the page.
+    if (el.tagName === "CANVAS" && /(^|\.)docs\.google\.com$/.test(location.hostname)) return false;
     if (el.tagName === "CANVAS" || el.tagName === "EMBED" || el.tagName === "OBJECT") return true;
-    const hint = [el.currentSrc || el.src || "", el.alt || "", typeof el.className === "string" ? el.className : "",
-      el.getAttribute("aria-label") || ""].join(" ");
+    // Judge by the picture's address and class only. Alt text and labels often say "brand" or
+    // "icon" about a real product photo (Vinted does), which wrongly flipped it to a negative.
+    const src = el.currentSrc || el.src || "";
+    const hint = src + " " + (typeof el.className === "string" ? el.className : "");
     if (el.tagName !== "IMG") {
       const bg = getComputedStyle(el).backgroundImage;
       if (!bg || bg === "none" || !bg.includes("url(")) return false;
       return !GRAPHIC_HINT.test(bg + " " + hint);
     }
+    // Any big raster picture is a photo; only vector art follows the page.
+    if (/\.svg(\?|#|$)|^data:image\/svg/i.test(src)) return false;
     return !GRAPHIC_HINT.test(hint);
   }
 
@@ -36,6 +42,9 @@
     }
   }
   const mq = matchMedia("(prefers-color-scheme: dark)");
+  // On a Mac the Nox app says when the Mac is dark, so a browser left on Light mode must not block it.
+  const IS_MAC = /Mac/i.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "");
+  const darkNow = () => mq.matches || IS_MAC;
   // Off until Nox says it turned dark mode on itself (see background.js).
   let enabled = false;
   let nativelyDark = false;
@@ -87,7 +96,7 @@
   // Top frame: invert light pages only. Sub-frame: inside an inverted top page, invert only
   // frames that are already dark (double flip = original look); if top is untouched, do nothing.
   function wantFilter() {
-    if (!enabled || !mq.matches) return false;
+    if (!enabled || !darkNow()) return false;
     if (isTop) return !nativelyDark;
     return parentInverted ? nativelyDark : false;
   }
@@ -107,7 +116,7 @@
     }
     classifyMedia();
     if (isTop) {
-      const inverted = enabled && mq.matches && !nativelyDark;
+      const inverted = enabled && darkNow() && !nativelyDark;
       for (const f of document.querySelectorAll("iframe")) {
         try { f.contentWindow.postMessage({ darkswitchInverted: inverted }, "*"); } catch (e) {}
       }

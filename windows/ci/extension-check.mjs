@@ -10,6 +10,7 @@ fs.mkdirSync(out, { recursive: true });
 const html = `<html><body style="margin:0;font:16px Arial;background:#fff;color:#202124">
 <div style="padding:16px;border-bottom:1px solid #ddd"><b style="color:#d93025;font-size:22px">Gmail</b> &nbsp; Search mail</div>
 ${[1,2,3,4,5,6].map(i=>`<div style="padding:14px 16px;border-bottom:1px solid #eee;background:${i%2?'#fff':'#f6f8fc'}"><b>Sender ${i}</b> &nbsp; Subject line number ${i} - preview text of the message</div>`).join('')}
+<img id="photo" alt="Olight Seeker 4, brand: Olight, condition: New" width="200" height="200" style="margin:16px" src="data:image/gif;base64,R0lGODlhAQABAIAAAP8AAAAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==">
 </body></html>`;
 const server = http.createServer((q, r) => { r.setHeader('content-type', 'text/html'); r.end(html); }).listen(8765);
 const dir = fs.mkdtempSync(path.join(process.env.TEMP || '.', 'pw-'));
@@ -26,6 +27,10 @@ await page.waitForTimeout(2500);
 await page.screenshot({ path: path.join(out, '10-web-dark.png') });
 const bg = await page.evaluate(() => getComputedStyle(document.documentElement).filter);
 console.log('html filter with PC dark:', bg);
+// A real product photo must be flipped back (so it keeps its true colours), even when its text says "brand".
+const photoFilter = await page.evaluate(() => getComputedStyle(document.getElementById('photo')).filter);
+console.log('photo filter with PC dark:', photoFilter);
 await ctx.close(); server.close();
+if (!/invert/.test(photoFilter)) { console.error('FAIL: photo would show as a negative'); process.exit(1); }
 if (!/invert/.test(bg)) { console.error('FAIL: page was not darkened'); process.exit(1); }
 console.log('PASS: extension darkened the page');
