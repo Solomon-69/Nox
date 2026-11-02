@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.4.3] - 2026-11-02
+### Fixed
+- Switching dark mode could crash Nox on some Macs. The cause was the old screen cross-fade, which called a private macOS function that behaves differently between macOS versions. That code is removed. Nox now uses only its own soft veil, the same on every Mac.
+
 ## [1.4.2] - 2026-11-02
 ### Fixed
 - The light/dark fade is smooth again on macOS 27.2. The window server's held-screen cross-fade stopped working there (the screen repainted live and then cut). Nox now always uses its own soft veil: it eases in, hides the repaint, and eases away over 0.7 s.
