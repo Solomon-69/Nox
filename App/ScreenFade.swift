@@ -17,11 +17,11 @@ enum ScreenFade {
     /// If the switch itself hangs, let go of the held screen after this long.
     private static let holdLimit: TimeInterval = 2.5
     /// Veil: how far it covers the screen at its peak (1 = fully opaque), and its timings.
-    private static let peak: CGFloat = 0.82
-    private static let rampIn: TimeInterval = 0.12
-    private static let veilOut: TimeInterval = 0.5
+    private static let peak: CGFloat = 0.97
+    private static let rampIn: TimeInterval = 0.18
+    private static let veilOut: TimeInterval = 0.7
     /// Extra settle time after our own look flips, so other apps have repainted underneath.
-    private static let settle: TimeInterval = 0.38
+    private static let settle: TimeInterval = 0.45
     /// DarkSwitch's own windows, lifted above the veil while it fades, with their old levels.
     private static var lifted: [(NSWindow, NSWindow.Level)] = []
     /// DarkSwitch's own windows held in the old look until the veil fade reaches them.
@@ -35,7 +35,10 @@ enum ScreenFade {
     /// Starts the fade before the switch. Returns false when there is no fade (Reduce Motion).
     static func freezeScreens() async -> Bool {
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return false }
-        if let handle = WindowServerFade.hold() {
+        // macOS 27.2 stopped honouring the window server's held-screen cross-fade (the screen kept repainting live and then
+        // cut). The veil is Nox's own and behaves the same on every macOS, so it is the default; the old way stays behind
+        // a hidden switch (defaults write com.solomon.DarkSwitch noxCrossFade -bool true).
+        if UserDefaults.standard.bool(forKey: "noxCrossFade"), let handle = WindowServerFade.hold() {
             mode = .crossFade(handle)
             dlog("fade: cross-fade holding the screen")
             // Never leave the screen held: if the switch hangs, let go anyway.

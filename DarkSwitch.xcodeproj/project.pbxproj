@@ -53,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareFriend.swift; sourceTree = "<group>"; };
+		117F6548EA0C66F9348D7907 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationCleanup.swift; sourceTree = "<group>"; };
 		195D24DFC07FDD050B4A1ED5 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
 		47307AD18F15B21D4201A35B /* icon-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
@@ -72,7 +73,6 @@
 		E7BADA17DD2938566C6AAA54 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
 		EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		EDCF39882CF16933AFF21C75 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
-		F971FFCE343768A495ADF4AA /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -89,10 +89,19 @@
 			children = (
 				F6027241FC83414EEADAA51F /* App */,
 				8EEB30026DF2028782E19526 /* Extension */,
-				D2D220552F31EBE66010B30D /* nox-main */,
+				504C4AD70812CBB5043C68D8 /* nox-gh */,
 				BF82F628BEE3E9F79813B2ED /* Resources */,
 				F3C9953C35A7A0E580E9E549 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		504C4AD70812CBB5043C68D8 /* nox-gh */ = {
+			isa = PBXGroup;
+			children = (
+				117F6548EA0C66F9348D7907 /* Signing.xcconfig */,
+			);
+			name = "nox-gh";
+			path = .;
 			sourceTree = "<group>";
 		};
 		8EEB30026DF2028782E19526 /* Extension */ = {
@@ -113,15 +122,6 @@
 			);
 			name = Resources;
 			path = Extension/Resources;
-			sourceTree = "<group>";
-		};
-		D2D220552F31EBE66010B30D /* nox-main */ = {
-			isa = PBXGroup;
-			children = (
-				F971FFCE343768A495ADF4AA /* Signing.xcconfig */,
-			);
-			name = "nox-main";
-			path = .;
 			sourceTree = "<group>";
 		};
 		F3C9953C35A7A0E580E9E549 /* Products */ = {
@@ -330,7 +330,7 @@
 		};
 		A813D6243DEAB688A8BCCCAC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F971FFCE343768A495ADF4AA /* Signing.xcconfig */;
+			baseConfigurationReference = 117F6548EA0C66F9348D7907 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -377,7 +377,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.1;
+				MARKETING_VERSION = 1.4.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -390,7 +390,7 @@
 		};
 		BA8001FD1440D8D3D58E290F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F971FFCE343768A495ADF4AA /* Signing.xcconfig */;
+			baseConfigurationReference = 117F6548EA0C66F9348D7907 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -443,7 +443,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.1;
+				MARKETING_VERSION = 1.4.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
