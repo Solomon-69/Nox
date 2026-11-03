@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.0] - 2026-11-03
+### Added
+- Check for updates: a new row at the bottom of Settings looks for a newer Nox, checks the download against its checksum, and installs it with one click.
+- Keyboard control in Settings: Up and Down move a highlight through the settings (wrapping around), Left and Right or Space and Return change the highlighted one, Esc clears the highlight and then closes the window.
+### Changed
+- The menu bar panel footer (Settings, Share, Quit) is smaller and centred, with a clearer hover.
+
 ## [1.4.3] - 2026-11-02
 ### Fixed
 - Switching dark mode could crash Nox on some Macs. The cause was the old screen cross-fade, which called a private macOS function that behaves differently between macOS versions. That code is removed. Nox now uses only its own soft veil, the same on every Mac.

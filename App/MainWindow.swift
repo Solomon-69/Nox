@@ -122,35 +122,56 @@ struct NoxThemed: ViewModifier {
 
 struct MainView: View {
     @ObservedObject var model: DarkSwitchModel
-    var body: some View { MainContent(model: model).modifier(NoxThemed()) }
+    /// Tests only: start with this row highlighted, and press these keys in order.
+    var startRow: NavID? = nil
+    var scriptedKeys: [NavKey] = []
+    var body: some View { MainContent(model: model, startRow: startRow, scriptedKeys: scriptedKeys).modifier(NoxThemed()) }
 }
 
 private struct MainContent: View {
     @ObservedObject var model: DarkSwitchModel
+    var startRow: NavID? = nil
+    var scriptedKeys: [NavKey] = []
     @Environment(\.noxTheme) private var theme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var sel: NavID?
+    @State private var rects: [NavID: CGRect] = [:]
+    @State private var shareTick = 0
+    @State private var hostWindow: NSWindow?
+    @State private var scriptStarted = false
+    @StateObject private var updater = AppUpdater(UpdateConfig(repo: "Solomon-69/Nox", appName: "Nox", bundleName: "Nox.app", zipName: "Nox-mac.zip"))
 
     var body: some View {
         VStack(spacing: 18) {
             VStack(spacing: 10) {
-                statusRow
+                statusRow.navRow(.status)
                 SettingRow(icon: "globe", title: "Websites follow your Mac",
                            detail: "Safari pages go dark with your Mac",
-                           isOn: Binding(get: { model.forceDark }, set: { model.setForceDark($0) }))
+                           isOn: Binding(get: { model.forceDark }, set: { model.setForceDark($0) })).navRow(.websites)
                 SettingRow(icon: "moon.stars", title: "Dark at night",
                            detail: "Switches by itself at the times below",
-                           isOn: Binding(get: { model.nightSchedule }, set: { model.setNightSchedule($0) }))
-                if model.nightSchedule { timesRow }
+                           isOn: Binding(get: { model.nightSchedule }, set: { model.setNightSchedule($0) })).navRow(.night)
+                if model.nightSchedule { timesRow.navRow(.times) }
                 SettingRow(icon: "wand.and.rays", title: "Smooth fade",
                            detail: "Softens the switch across every open app",
-                           isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) }))
+                           isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) })).navRow(.fade)
                 SettingRow(icon: "power", title: "Open at login",
                            detail: "Start Nox when your Mac starts",
-                           isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) }))
+                           isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) })).navRow(.login)
                 SettingRow(icon: "dock.rectangle", title: "Show in Dock",
                            detail: "Off: Nox stays in the menu bar only",
-                           isOn: Binding(get: { model.showInDock }, set: { model.setShowInDock($0) }))
-                extensionRow
-                NoxShareRow()
+                           isOn: Binding(get: { model.showInDock }, set: { model.setShowInDock($0) })).navRow(.dock)
+                extensionRow.navRow(.ext)
+                NoxShareRow(trigger: shareTick).navRow(.share)
+                UpdateRow(updater: updater, tint: theme.violet, ink: theme.text, mute: theme.dim, track: theme.trackOff, onTint: .white)
+                    .modifier(CardStyle()).navRow(.update)
+            }
+            .coordinateSpace(name: "nav")
+            .onPreferenceChange(NavRectKey.self) { rects = $0 }
+            .overlay(alignment: .topLeading) {
+                NavHighlight(rect: sel.flatMap { rects[$0] })
+                    .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: sel)
+                    .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: rects[sel ?? .status])
             }
             Text("Click the menu bar switch once to flip dark mode. Right-click it (or Option-click) for options.")
                 .font(.system(size: 11))
@@ -162,6 +183,70 @@ private struct MainContent: View {
         .background(LinearGradient(colors: [theme.bgTop, theme.bgBottom], startPoint: .top, endPoint: .bottom)
             .ignoresSafeArea())
         .noFocusRing()
+        .background(NavKeyCatcher(handle: handleKey, window: { hostWindow = $0 }))
+        .onAppear {
+            if sel == nil { sel = startRow }
+            guard !scriptedKeys.isEmpty, !scriptStarted else { return }
+            scriptStarted = true
+            for (i, k) in scriptedKeys.enumerated() {   // tests: the same handler the real keys use
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.35) { _ = handleKey(k) }
+            }
+        }
+    }
+
+    // MARK: Keyboard
+
+    private var navOrder: [NavID] { NavID.allCases.filter { $0 != .times || model.nightSchedule } }
+
+    private func handleKey(_ key: NavKey) -> Bool {
+        switch key {
+        case .up, .down:
+            let order = navOrder
+            guard let cur = sel, let i = order.firstIndex(of: cur) else { sel = key == .down ? order.first : order.last; return true }
+            sel = order[(i + (key == .down ? 1 : order.count - 1)) % order.count]
+            return true
+        case .esc:
+            if sel != nil { sel = nil } else { hostWindow?.performClose(nil) }
+            return true
+        case .left, .right, .space, .ret, .enter:
+            guard let cur = sel else { return false }
+            let want: Bool? = key == .left ? false : key == .right ? true : nil
+            activate(cur, want: want, stepKey: key)
+            return true
+        }
+    }
+
+    private func activate(_ id: NavID, want: Bool?, stepKey: NavKey) {
+        func flip(_ now: Bool, _ set: (Bool) -> Void) { let w = want ?? !now; if w != now { set(w) } }
+        switch id {
+        case .status: flip(model.isDark) { _ in model.toggleDark() }
+        case .websites: flip(model.forceDark, model.setForceDark)
+        case .night: flip(model.nightSchedule, model.setNightSchedule)
+        case .fade: flip(model.smoothFade, model.setSmoothFade)
+        case .login: flip(model.openAtLogin, model.setOpenAtLogin)
+        case .dock: flip(model.showInDock, model.setShowInDock)
+        case .times:
+            if stepKey == .left || stepKey == .right { selectTab(stepKey == .right) } else { nextPreset() }
+        case .ext:
+            if model.extensionOn == false { model.openExtensionSettings() }
+        case .share: if want == nil { shareTick += 1 }
+        case .update:
+            guard want == nil else { return }
+            switch updater.state {
+            case .available: Task { await updater.install() }
+            case .checking, .downloading, .installing: break
+            default: Task { await updater.check() }
+            }
+        }
+    }
+
+    /// Space or Return on the times row: the next preset chip for the tab being edited.
+    private func nextPreset() {
+        let dark = [19 * 60, 20 * 60, 21 * 60, 22 * 60], light = [6 * 60, 7 * 60, 7 * 60 + 30, 8 * 60]
+        let list = editingLight ? light : dark
+        let cur = editingLight ? model.lightAt : model.darkAt
+        let next = list[((list.firstIndex(of: cur) ?? -1) + 1) % list.count]
+        if editingLight { model.setTimes(model.darkAt, next) } else { model.setTimes(next, model.lightAt) }
     }
 
     /// The status row: what the Mac is now and when it changes next, with a compact switch.
@@ -541,22 +626,14 @@ private struct QuickPanelContent: View {
             .frame(minHeight: 30)
             .modifier(CardStyle())
             // Three equal columns: Share sits in the exact centre, under the arrow.
-            HStack(spacing: 0) {
-                Button(action: openApp) {
-                    Label("Settings", systemImage: "gearshape")
-                }
-                .buttonStyle(.plain)
-                .font(.system(size: 12, weight: .medium)).foregroundStyle(theme.violet)
-                .frame(maxWidth: .infinity)
+            HStack(spacing: 2) {
+                FooterButton(title: "Settings", icon: "gearshape", tint: theme.violet, action: openApp)
                 NoxShareLink()
-                    .frame(maxWidth: .infinity)
-                Button(action: quit) {
-                    Label("Quit", systemImage: "power")
-                }
-                .buttonStyle(.plain)
-                .font(.system(size: 12, weight: .medium)).foregroundStyle(theme.dim)
-                .frame(maxWidth: .infinity)
+                FooterButton(title: "Quit", icon: "power", tint: theme.dim, action: quit)
             }
+            .padding(3)
+            .background(Capsule().fill(theme.card))
+            .overlay(Capsule().strokeBorder(theme.stroke, lineWidth: 1))
         }
         .padding(16)
         .frame(width: 300)
@@ -578,17 +655,13 @@ private struct QuickPanelContent: View {
 
 /// "Share with a friend" card in Settings: zips a clean copy of Nox and opens the share picker (AirDrop first).
 struct NoxShareRow: View {
+    var trigger = 0   // bumped by the keyboard (Space or Return on this row)
     @Environment(\.noxTheme) private var theme
     @State private var box = ShareAnchorBox()
     @State private var busy = false
     @State private var error: String?
     var body: some View {
-        Button {
-            guard !busy else { return }
-            busy = true; error = nil
-            ShareFriend.share(from: box.view) { error = $0; busy = false }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { busy = false }
-        } label: {
+        Button(action: run) {
             HStack(spacing: 12) {
                 RowIcon(name: "square.and.arrow.up")
                 VStack(alignment: .leading, spacing: 2) {
@@ -605,6 +678,14 @@ struct NoxShareRow: View {
         .modifier(CardStyle())
         .background(ShareAnchor(box: box))
         .accessibilityLabel(ShareFriend.title)
+        .onChange(of: trigger) { _ in run() }
+    }
+
+    private func run() {
+        guard !busy else { return }
+        busy = true; error = nil
+        ShareFriend.share(from: box.view) { error = $0; busy = false }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { busy = false }
     }
 }
 
@@ -613,12 +694,43 @@ struct NoxShareLink: View {
     @Environment(\.noxTheme) private var theme
     @State private var box = ShareAnchorBox()
     var body: some View {
-        Button { ShareFriend.share(from: box.view) { _ in } } label: {
-            Label("Share", systemImage: "square.and.arrow.up")
+        FooterButton(title: "Share", icon: "square.and.arrow.up", tint: theme.violet) {
+            ShareFriend.share(from: box.view) { _ in }
         }
-        .buttonStyle(.plain)
-        .font(.system(size: 12, weight: .medium)).foregroundStyle(theme.violet)
         .background(ShareAnchor(box: box))
         .help(ShareFriend.title)
+    }
+}
+
+/// Footer action: icon over label, centred in its column, soft pill on hover, springy press.
+struct FooterButton: View {
+    @Environment(\.noxTheme) private var theme
+    let title: String
+    let icon: String
+    let tint: Color
+    let action: () -> Void
+    @State private var hover = false
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon).font(.system(size: 12, weight: .medium))
+                Text(title).font(.system(size: 12, weight: .semibold, design: .rounded))
+            }
+            .foregroundStyle(tint)
+            .frame(maxWidth: .infinity, minHeight: 28)
+            .background(Capsule().fill(hover ? tint.opacity(0.16) : Color.clear))
+            .contentShape(Capsule())
+        }
+        .buttonStyle(FooterPressStyle())
+        .onHover { hover = $0 }
+        .animation(.easeOut(duration: 0.15), value: hover)
+    }
+}
+
+struct FooterPressStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }

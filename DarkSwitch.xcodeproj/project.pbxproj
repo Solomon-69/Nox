@@ -13,6 +13,7 @@
 		29DD08C4907E75D93FEC9D8A /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = E7BADA17DD2938566C6AAA54 /* content.js */; };
 		34CCE5BE4C858E96C034E1A9 /* NoxDark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A724A917DD3BC8D833A04B /* NoxDark.swift */; };
 		3B17B4313778B353F0BE9858 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCF39882CF16933AFF21C75 /* Onboarding.swift */; };
+		453097BCB767F4F46130D800 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C87D0D2C693D8A44AC3AB2 /* AppUpdater.swift */; };
 		47BAEF1DBCD1B6B73D6C929D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8B79852062EA5205328A1F9 /* Assets.xcassets */; };
 		5CA6AC8C5442211E5F233663 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 47307AD18F15B21D4201A35B /* icon-128.png */; };
 		70CE415002023EBCF9420922 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */; };
@@ -24,6 +25,7 @@
 		C28466ADA60B870D30958D43 /* ScreenFade.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8ABD42B987FCF43FA1489D /* ScreenFade.swift */; };
 		CA40E5818BC46827924375B7 /* SmoothSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */; };
 		CBB3A4F8272061E9F91A3E0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EB6BFFF4E022201204AD96 /* AppDelegate.swift */; };
+		F23862E13215CE10DCE8681C /* SettingsNav.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A73C4DFC64E14115B93D155 /* SettingsNav.swift */; };
 		FC1C95389C3FA50C1395F07A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5227CD8D69D4E58BDA61B40F /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,16 +54,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		07C87D0D2C693D8A44AC3AB2 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
 		0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareFriend.swift; sourceTree = "<group>"; };
-		1026B12920675BA1F4E46133 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationCleanup.swift; sourceTree = "<group>"; };
 		195D24DFC07FDD050B4A1ED5 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
 		47307AD18F15B21D4201A35B /* icon-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
 		4E282D52EF3A773E72070DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5227CD8D69D4E58BDA61B40F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		57BAD285A8276B42A2AD4316 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothSwitch.swift; sourceTree = "<group>"; };
 		68A724A917DD3BC8D833A04B /* NoxDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoxDark.swift; sourceTree = "<group>"; };
+		6A73C4DFC64E14115B93D155 /* SettingsNav.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNav.swift; sourceTree = "<group>"; };
 		76EB6BFFF4E022201204AD96 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8F528C5BBBFF1AA205198A40 /* ChipDrumPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipDrumPicker.swift; sourceTree = "<group>"; };
 		AE2AD1A978093D8BFC70D14A /* SafariSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariSetup.swift; sourceTree = "<group>"; };
@@ -89,10 +93,19 @@
 			children = (
 				F6027241FC83414EEADAA51F /* App */,
 				8EEB30026DF2028782E19526 /* Extension */,
-				B16F5F1D9487C301976665D3 /* nox-crashfix */,
+				4CF3F939DDAA4DFF3EF7AAAE /* nox-clone */,
 				BF82F628BEE3E9F79813B2ED /* Resources */,
 				F3C9953C35A7A0E580E9E549 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		4CF3F939DDAA4DFF3EF7AAAE /* nox-clone */ = {
+			isa = PBXGroup;
+			children = (
+				57BAD285A8276B42A2AD4316 /* Signing.xcconfig */,
+			);
+			name = "nox-clone";
+			path = .;
 			sourceTree = "<group>";
 		};
 		8EEB30026DF2028782E19526 /* Extension */ = {
@@ -101,15 +114,6 @@
 				EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */,
 			);
 			path = Extension;
-			sourceTree = "<group>";
-		};
-		B16F5F1D9487C301976665D3 /* nox-crashfix */ = {
-			isa = PBXGroup;
-			children = (
-				1026B12920675BA1F4E46133 /* Signing.xcconfig */,
-			);
-			name = "nox-crashfix";
-			path = .;
 			sourceTree = "<group>";
 		};
 		BF82F628BEE3E9F79813B2ED /* Resources */ = {
@@ -137,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				76EB6BFFF4E022201204AD96 /* AppDelegate.swift */,
+				07C87D0D2C693D8A44AC3AB2 /* AppUpdater.swift */,
 				C8B79852062EA5205328A1F9 /* Assets.xcassets */,
 				8F528C5BBBFF1AA205198A40 /* ChipDrumPicker.swift */,
 				4E282D52EF3A773E72070DAC /* Info.plist */,
@@ -147,6 +152,7 @@
 				13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */,
 				AE2AD1A978093D8BFC70D14A /* SafariSetup.swift */,
 				CD8ABD42B987FCF43FA1489D /* ScreenFade.swift */,
+				6A73C4DFC64E14115B93D155 /* SettingsNav.swift */,
 				0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */,
 				67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */,
 			);
@@ -261,6 +267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CBB3A4F8272061E9F91A3E0A /* AppDelegate.swift in Sources */,
+				453097BCB767F4F46130D800 /* AppUpdater.swift in Sources */,
 				19D602CD98B57AD50D960CB9 /* ChipDrumPicker.swift in Sources */,
 				70CE415002023EBCF9420922 /* MainWindow.swift in Sources */,
 				34CCE5BE4C858E96C034E1A9 /* NoxDark.swift in Sources */,
@@ -268,6 +275,7 @@
 				BACBD07B842461C2772D2264 /* RegistrationCleanup.swift in Sources */,
 				B3FA02AFA879194E882861E2 /* SafariSetup.swift in Sources */,
 				C28466ADA60B870D30958D43 /* ScreenFade.swift in Sources */,
+				F23862E13215CE10DCE8681C /* SettingsNav.swift in Sources */,
 				22C667C610E04D0C54B6699A /* ShareFriend.swift in Sources */,
 				CA40E5818BC46827924375B7 /* SmoothSwitch.swift in Sources */,
 				FC1C95389C3FA50C1395F07A /* main.swift in Sources */,
@@ -330,7 +338,7 @@
 		};
 		A813D6243DEAB688A8BCCCAC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1026B12920675BA1F4E46133 /* Signing.xcconfig */;
+			baseConfigurationReference = 57BAD285A8276B42A2AD4316 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -377,7 +385,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.5.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -390,7 +398,7 @@
 		};
 		BA8001FD1440D8D3D58E290F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1026B12920675BA1F4E46133 /* Signing.xcconfig */;
+			baseConfigurationReference = 57BAD285A8276B42A2AD4316 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -443,7 +451,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.3;
+				MARKETING_VERSION = 1.5.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

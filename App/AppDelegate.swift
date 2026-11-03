@@ -630,6 +630,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             let pg = Int(bits.count > 1 ? bits[1] : "") ?? 0
             NSApp.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)   // this app only, never the Mac
             snapshot(OnboardingView(model: model, setup: setupActions, finish: {}, page: pg), to: "/tmp/nox-welcome-\(look)-\(pg).png")
+        case let cmd? where cmd.hasPrefix("settingsnap:"):
+            // "settingsnap:dark:status:down,right" -> /tmp/nox-settings-<look>-<tag>.png (off-screen, throwaway model,
+            // never touches the real settings). Fields: look, start row (or "none"), keys pressed in order.
+            let bits = cmd.dropFirst(12).split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+            let look = bits.first ?? "light"
+            let names: [String: NavKey] = ["up": .up, "down": .down, "left": .left, "right": .right, "space": .space, "return": .ret, "esc": .esc]
+            let start = bits.count > 1 ? NavID.allCases.first { "\($0)" == bits[1] } : nil
+            let keys = (bits.count > 2 ? bits[2] : "").split(separator: ",").compactMap { names[String($0)] }
+            let tag = (bits.count > 3 ? bits[3] : "") + "\(bits.count > 1 ? bits[1] : "none")-\(keys.count)"
+            let m = DarkSwitchModel()
+            m.extensionOn = true; m.darkAt = 20 * 60; m.lightAt = 7 * 60
+            m.toggleDark = { m.isDark.toggle() }
+            m.setForceDark = { m.forceDark = $0 }; m.setNightSchedule = { m.nightSchedule = $0 }
+            m.setSmoothFade = { m.smoothFade = $0 }; m.setOpenAtLogin = { m.openAtLogin = $0 }
+            m.setShowInDock = { m.showInDock = $0 }; m.setTimes = { m.darkAt = $0; m.lightAt = $1 }
+            if bits.count > 4, bits[4] == "night" { m.nightSchedule = true }
+            NSApp.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)   // this app only, never the Mac
+            snapshot(MainView(model: m, startRow: start, scriptedKeys: keys), to: "/tmp/nox-settings-\(look)-\(tag).png")
         case "welcome": showOnboarding()
         case "sharetest": ShareFriend.selfTest(report: "/tmp/nox-share-test.txt")
         case "iconslide":
