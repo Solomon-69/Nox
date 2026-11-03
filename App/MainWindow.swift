@@ -638,13 +638,15 @@ private struct QuickPanelContent: View {
         .padding(16)
         .frame(width: 300)
         .fixedSize(horizontal: false, vertical: true)
-        // Extend the gradient under the popover's arrow so the top sliver matches the panel.
-        .background(LinearGradient(colors: [theme.bgTop, theme.bgBottom], startPoint: .top, endPoint: .bottom)
-            .padding(-20).ignoresSafeArea())
-                .noFocusRing()
+        // Only the content springs in. The fill behind it never fades, shrinks or moves, so the arrow and
+        // the body are one connected shape of one colour from the first frame (no seam while opening).
         .opacity(appeared ? 1 : 0)
         .scaleEffect(appeared ? 1 : 0.96, anchor: .top)
         .offset(y: appeared ? 0 : -8)
+        // Extend the gradient under the popover's arrow so the top sliver matches the panel.
+        .background(LinearGradient(colors: [theme.bgTop, theme.bgBottom], startPoint: .top, endPoint: .bottom)
+            .padding(-20).ignoresSafeArea())
+        .noFocusRing()
         .onAppear { springIn() }
         .onChange(of: model.openCount) { _ in springIn() }
         .animation(NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.75), value: model.isDark)

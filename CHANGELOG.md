@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.2] - 2026-11-03
+### Fixed
+- The little arrow on top of the menu bar panel is one connected shape with the panel again. Only the panel's content springs in now; the colour behind it stays put, so there is no seam or gap where the arrow meets the body.
+### Added
+- `tests/popover-seam-check.py` takes a picture of the open panel in light and dark and fails if the arrow and body differ.
+
 ## [1.5.1] - 2026-11-03
 ### Fixed
 - The light/dark fade is gentle again: a light veil that eases in and out, not a near-black cover over the whole screen.

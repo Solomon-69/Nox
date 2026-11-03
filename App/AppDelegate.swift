@@ -648,6 +648,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             if bits.count > 4, bits[4] == "night" { m.nightSchedule = true }
             NSApp.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)   // this app only, never the Mac
             snapshot(MainView(model: m, startRow: start, scriptedKeys: keys), to: "/tmp/nox-settings-\(look)-\(tag).png")
+        case "popdump":
+            // Tests: writes the popover's view layers to /tmp/nox-popdump.txt, then closes it.
+            showPopover()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                var out: [String] = []
+                func dump(_ v: NSView, _ d: Int) {
+                    let bg = v.layer?.backgroundColor.flatMap { NSColor(cgColor: $0) }?.description ?? "-"
+                    out.append(String(repeating: "  ", count: d) + "\(type(of: v)) \(v.frame) bg=\(bg)")
+                    v.subviews.forEach { dump($0, d + 1) }
+                }
+                if let w = self.popover.contentViewController?.view.window, let root = w.contentView?.superview ?? w.contentView {
+                    out.append("window \(type(of: w)) \(w.frame) opaque=\(w.isOpaque) bg=\(w.backgroundColor.description)")
+                    dump(root, 0)
+                    if let f = self.popover.contentViewController?.view.superview {
+                        for sel in ["backgroundColor", "setBackgroundColor:", "_setBackgroundColor:", "setAppearance:", "_backgroundView"] {
+                            out.append("frame \(type(of: f)) responds \(sel): \(f.responds(to: Selector(sel)))")
+                        }
+                    }
+                }
+                try? out.joined(separator: "\n").write(toFile: "/tmp/nox-popdump.txt", atomically: true, encoding: .utf8)
+                self.closePanel()
+            }
+        case let cmd? where cmd.hasPrefix("popshot:"):
+            // Tests: "popshot:light" / "popshot:dark" -> /tmp/nox-pop-<look>.png, the open popover (arrow included), then closes it.
+            let look = String(cmd.dropFirst(8))
+            NSApp.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)   // this app only, never the Mac
+            popover.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)
+            showPopover()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                if let w = self.popover.contentViewController?.view.window,
+                   let img = CGWindowListCreateImage(.null, .optionIncludingWindow, CGWindowID(w.windowNumber), [.boundsIgnoreFraming, .bestResolution]) {
+                    let rep = NSBitmapImageRep(cgImage: img)
+                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: "/tmp/nox-pop-\(look).png"))
+                }
+                self.closePanel()
+            }
+        case let cmd? where cmd.hasPrefix("popburst:"):
+            // Tests: "popburst:light" / "popburst:dark" -> /tmp/nox-burst-<look>-<ms>.png, frames of the popover opening.
+            let look = String(cmd.dropFirst(9))
+            NSApp.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)   // this app only, never the Mac
+            popover.appearance = NSAppearance(named: look == "dark" ? .darkAqua : .aqua)
+            showPopover()
+            for ms in [30, 90, 160, 250, 380, 600] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(ms)) {
+                    guard let w = self.popover.contentViewController?.view.window,
+                          let img = CGWindowListCreateImage(.null, .optionIncludingWindow, CGWindowID(w.windowNumber), [.boundsIgnoreFraming, .bestResolution]) else { return }
+                    try? NSBitmapImageRep(cgImage: img).representation(using: .png, properties: [:])?
+                        .write(to: URL(fileURLWithPath: "/tmp/nox-burst-\(look)-\(ms).png"))
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { self.closePanel() }
         case "welcome": showOnboarding()
         case "sharetest": ShareFriend.selfTest(report: "/tmp/nox-share-test.txt")
         case "iconslide":
