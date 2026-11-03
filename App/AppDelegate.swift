@@ -767,12 +767,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             if waited < Self.knobSlideTime {
                 try? await Task.sleep(nanoseconds: UInt64((Self.knobSlideTime - waited) * 1_000_000_000))
             }
-            // Then the whole screen, menu bar and icon included, fades as one under a soft veil
-            // (no Screen Recording, Nox never sees the screen).
+            // Then the whole screen, menu bar and icon included, fades as one: macOS's own
+            // cross-fade (no Screen Recording, Nox never sees the screen), otherwise a soft veil.
             let faded = fading ? await ScreenFade.freezeScreens() : false
             // Under the veil the bar behind the icon stays in the old look until the fade, so the
-            // icon keeps its current colour until then.
-            if faded { self.iconColorOverride = barIsDark ? .white : .black }
+            // icon keeps its current colour until then. (The cross-fade holds the screen itself.)
+            if faded, ScreenFade.isVeil { self.iconColorOverride = barIsDark ? .white : .black }
             let ok = await self.switchAppearance(dark: wantDark)
             if ok { UserDefaults.standard.set(true, forKey: "switchWorked") }
             // macOS repaints a moment after it says yes: keep the screen held until it really has.

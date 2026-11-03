@@ -1,17 +1,25 @@
 import Cocoa
 
-/// Softens the light/dark switch across every open app. Nox never uses or asks for Screen Recording,
-/// and uses no private macOS calls: a soft veil in the old look's background colour eases in over the
-/// whole screen and eases away once apps have repainted.
+/// Softens the light/dark switch across every open app. Nox never uses or asks for Screen Recording.
+/// Two ways, picked each time:
+/// - Cross-fade: macOS's own window server holds the screen as it is (menu bar included), the Mac
+///   switches underneath, then the window server cross-fades to the new look. Nox never sees the
+///   screen: the window server keeps the picture to itself, so no permission is involved.
+/// - Veil (if the cross-fade isn't available on this Mac): a soft veil in the old look's
+///   background colour eases in over the whole screen and eases away once apps have repainted.
 @MainActor
 enum ScreenFade {
-    private enum Mode { case none, veil([NSWindow]) }
+    private enum Mode { case none, crossFade(Int32), veil([NSWindow]) }
     private static var mode: Mode = .none
 
+    /// Cross-fade length once macOS has repainted.
+    private static let crossFadeLength: Float = 0.5
+    /// If the switch itself hangs, let go of the held screen after this long.
+    private static let holdLimit: TimeInterval = 2.5
     /// Veil: how far it covers the screen at its peak (1 = fully opaque), and its timings.
-    private static let peak: CGFloat = 0.18
+    private static let peak: CGFloat = 0.82
     private static let rampIn: TimeInterval = 0.12
-    private static let veilOut: TimeInterval = 0.45
+    private static let veilOut: TimeInterval = 0.5
     /// Extra settle time after our own look flips, so other apps have repainted underneath.
     private static let settle: TimeInterval = 0.38
     /// DarkSwitch's own windows, lifted above the veil while it fades, with their old levels.
@@ -21,12 +29,22 @@ enum ScreenFade {
     /// Tests only: treat every visible DarkSwitch window as one you're using (lifted and live).
     nonisolated(unsafe) static var liftAllForTest = false
 
-    /// True while the veil is up.
+    /// True while the veil (not the cross-fade) is up.
     static var isVeil: Bool { if case .veil = mode { return true }; return false }
 
     /// Starts the fade before the switch. Returns false when there is no fade (Reduce Motion).
     static func freezeScreens() async -> Bool {
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return false }
+        if let handle = WindowServerFade.hold() {
+            mode = .crossFade(handle)
+            dlog("fade: cross-fade holding the screen")
+            // Never leave the screen held: if the switch hangs, let go anyway.
+            DispatchQueue.main.asyncAfter(deadline: .now() + holdLimit) {
+                if case .crossFade(let h) = mode, h == handle { dlog("fade: hold limit reached"); fadeOut() }
+            }
+            return true
+        }
+        dlog("fade: cross-fade not available, using the veil")
         let windows = await showVeil()
         mode = windows.isEmpty ? .none : .veil(windows)
         return !windows.isEmpty
@@ -47,6 +65,10 @@ enum ScreenFade {
         switch mode {
         case .none:
             releaseOwnLook(); NoxLook.shared.mix = nil
+        case .crossFade(let handle):
+            mode = .none
+            WindowServerFade.crossFade(handle, over: crossFadeLength)
+            liftAllForTest = false
         case .veil(let windows):
             mode = .none
             fadeVeil(windows)
@@ -165,6 +187,51 @@ enum ScreenFade {
         w.setFrame(screen.frame, display: false)
         w.orderFrontRegardless()
         return w
+    }
+}
+
+/// macOS's own screen cross-fade, done entirely inside the window server (the same one macOS uses
+/// for its own transitions). Nox never receives a picture of the screen, so no permission is
+/// needed. These calls aren't public: they're looked up at run time, and if any is missing or
+/// fails, Nox uses the veil instead.
+enum WindowServerFade {
+    /// Matches the window server's transition description: fade over the whole screen.
+    private struct Spec { var unused: UInt32 = 0; var type: Int32 = 1; var option: Int32 = 0; var window: UInt32 = 0; var colour: UnsafeMutablePointer<Float>? = nil }
+    private typealias ConnFn = @convention(c) () -> Int32
+    private typealias NewFn = @convention(c) (Int32, UnsafeRawPointer, UnsafeMutablePointer<Int32>) -> Int32
+    private typealias InvokeFn = @convention(c) (Int32, Int32, Float) -> Int32
+    private typealias ReleaseFn = @convention(c) (Int32, Int32) -> Int32
+
+    private struct Calls { let conn: ConnFn; let new: NewFn; let invoke: InvokeFn; let release: ReleaseFn }
+
+    private static let calls: Calls? = {
+        guard MemoryLayout<Spec>.size == 24,
+              let lib = dlopen("/System/Library/PrivateFrameworks/SkyLight.framework/SkyLight", RTLD_LAZY),
+              let c = dlsym(lib, "SLSMainConnectionID"), let n = dlsym(lib, "SLSNewTransition"),
+              let i = dlsym(lib, "SLSInvokeTransition"), let r = dlsym(lib, "SLSReleaseTransition")
+        else { return nil }
+        return Calls(conn: unsafeBitCast(c, to: ConnFn.self), new: unsafeBitCast(n, to: NewFn.self),
+                     invoke: unsafeBitCast(i, to: InvokeFn.self), release: unsafeBitCast(r, to: ReleaseFn.self))
+    }()
+
+    /// Holds the screen as it is right now. Returns a handle, or nil if not available.
+    static func hold() -> Int32? {
+        guard let calls else { return nil }
+        var spec = Spec()
+        var handle: Int32 = 0
+        let err = withUnsafePointer(to: &spec) { calls.new(calls.conn(), UnsafeRawPointer($0), &handle) }
+        guard err == 0, handle != 0 else { dlog("fade: cross-fade refused (\(err))"); return nil }
+        return handle
+    }
+
+    /// Cross-fades from the held screen to the live one, then tidies up.
+    static func crossFade(_ handle: Int32, over seconds: Float) {
+        guard let calls else { return }
+        let cid = calls.conn()
+        let err = calls.invoke(cid, handle, seconds)
+        if err != 0 { dlog("fade: cross-fade invoke failed (\(err))"); _ = calls.release(cid, handle); return }
+        // The window server usually lets go by itself when the fade ends; release just in case.
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(seconds) + 0.2) { _ = calls.release(cid, handle) }
     }
 }
 
