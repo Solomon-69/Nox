@@ -11,9 +11,9 @@
 <meta property="og:title" content="Nox">
 <meta property="og:description" content="One click flips your Mac between light and dark. Free for Mac and Windows.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="showcase/nox-og.png">
-<link rel="icon" type="image/png" href="img/icon.png">
-<link rel="apple-touch-icon" href="img/icon.png">
+<meta property="og:image" content="pg/showcase/nox-og.png">
+<link rel="icon" type="image/png" href="pg/img/icon.png">
+<link rel="apple-touch-icon" href="pg/img/icon.png">
 <style>
   :root {
     --bg: #f5f4f9;
@@ -192,7 +192,7 @@
     .js .reveal { opacity: 1; transform: none; }
   }
   /* showcase pictures fade softly into the page (edges are feathered in the image itself) */
-  img[src*="showcase/"] { border-radius: 0 !important; box-shadow: none !important; }
+  img[src*="pg/showcase/"] { border-radius: 0 !important; box-shadow: none !important; }
 
   /* ---------- Mac / Windows (page standards) ---------- */
   html[data-os="windows"] .mac-only, html:not([data-os="windows"]) .win-only { display: none !important; }
@@ -215,23 +215,24 @@
   .install .card h3 { display: flex; align-items: center; gap: 10px; }
   html[data-os="windows"] .install .card.win { order: -1; }
 </style>
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+<script>try{history.scrollRestoration='manual'}catch(e){}if(!location.hash){scrollTo(0,0);addEventListener('pageshow',function(){scrollTo(0,0)});addEventListener('load',function(){scrollTo(0,0);setTimeout(function(){scrollTo(0,0)},60)})}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="top" id="top">
   <div class="wrap bar">
-    <a class="brand" href="#top" aria-label="Nox, back to top">
-      <span class="mark"><img src="img/icon.png" width="34" height="34" alt=""></span>
+    <a class="brand" href="https://solomon-69.github.io/Mac-Apps/" aria-label="Nox, back to all apps">
+      <span class="mark"><img src="pg/img/icon.png" width="34" height="34" alt=""></span>
       Nox
     </a>
     <nav aria-label="Sections">
       <ul>
         <li class="opt"><a href="#features">Features</a></li>
-        <li class="opt"><a href="#welcome">Welcome</a></li>
         <li><a href="#install">Install</a></li>
         <li class="opt"><a href="#faq">FAQ</a></li>
-        <li><a href="https://github.com/Solomon-69/Nox" target="_blank" rel="noopener">GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -241,7 +242,7 @@
   <div class="wrap hero">
     <div>
       <picture class="appicon">
-        <img src="img/icon.png" width="96" height="96" alt="The Nox app icon">
+        <img src="pg/img/icon.png" width="96" height="96" alt="The Nox app icon">
       </picture>
       <span class="eyebrow"><i aria-hidden="true"></i>Free for Mac and Windows</span>
       <h1>Nox</h1>
@@ -249,32 +250,27 @@
       <p class="lede">Nox is a small menu bar app. Click its switch and your whole Mac goes dark or light. Add the Safari or Chrome extension and web pages go dark too, while Nox's own switch is on.</p>
       <div class="os-switch" role="group" aria-label="Show the Mac or Windows version"><button type="button" data-os-pick="mac" aria-pressed="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>Mac</button><button type="button" data-os-pick="windows" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.3l7.4-1v7.2H3zM11.3 4.2L21 2.8v8.7h-9.7zM3 12.4h7.4v7.2L3 18.6zM11.3 12.4H21v8.8l-9.7-1.4z"/></svg>Windows</button></div>
       <div class="downloads">
-        <a class="btn primary" id="dl-mac" data-os="mac" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg" target="_blank" rel="noopener">
+        <a class="btn primary" id="dl-mac" data-os="mac" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg">
           <svg class="os" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>
           <span>Download for Mac<small>macOS 13 or later</small></span>
           <svg class="arrow" aria-hidden="true" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>
         </a>
-        <a class="btn" id="dl-win" data-os="windows" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip" target="_blank" rel="noopener">
+        <a class="btn" id="dl-win" data-os="windows" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip">
           <svg class="os" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.3l7.4-1v7.2H3zM11.3 4.2L21 2.8v8.7h-9.7zM3 12.4h7.4v7.2L3 18.6zM11.3 12.4H21v8.8l-9.7-1.4z"/></svg>
           <span>Download for Windows<small>Windows 10 or 11, 64-bit</small></span>
           <svg class="arrow" aria-hidden="true" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 8h9.5M8.5 4l4 4-4 4"/></svg>
         </a>
       </div>
-      <p class="dlnote">Version 1.4.3. The download buttons give the last published build.</p>
+      <p class="dlnote">Version 1.4.3. The download button always gives the newest build.</p>
       <p class="reqs"><b>Mac:</b> macOS 13 or later. <b>Windows:</b> Windows 10 or 11, with the free .NET 8 Desktop Runtime. Free, open source (MIT licence), no account needed.</p>
     </div>
 
     <div class="stagebox">
       <div class="glow" aria-hidden="true"></div>
-      <div class="shot mac-only">
-        <picture class="float">
-          <source media="(prefers-color-scheme: dark)" srcset="showcase/nox-1-dark.png">
-          <img src="showcase/nox-1-light.png" width="1760" height="1120" fetchpriority="high" alt="The Nox panel open under its menu bar switch">
-        </picture>
-      </div>
+      <div class="shot mac-only"><div class="mbar" aria-hidden="true" style="width:min(440px,100%)"><div class="side l"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1.4" fill="currentColor"/></svg><svg viewBox="0 0 24 24" style="width:19px"><rect x="2" y="7" width="17" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4.5" y="9.5" width="10" height="5" rx="1" fill="currentColor"/><path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><b class="pad"><svg viewBox="0 0 24 24"><rect x="2" y="6.5" width="20" height="11" rx="5.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="12" r="3.2" fill="currentColor"/></svg></b><div class="side r"><i class="clock">Wed 9:41</i></div></div><div class="pv" style="--w:440px"><picture class="float"><source media="(prefers-color-scheme: dark)" srcset="pg/img/pop-shot-panel-dark.png"><img src="pg/img/pop-shot-panel-light.png" width="440" height="587" alt="The Nox panel open under its menu bar switch" fetchpriority="high"></picture></div></div>
       <div class="winstage win-only">
-        <picture><source media="(prefers-color-scheme: dark)" srcset="img/win/nox-panel-dark.png"><img src="img/win/nox-panel-light.png" alt="The Nox panel open above the Windows tray" loading="lazy"></picture>
-        <picture class="tray"><source media="(prefers-color-scheme: dark)" srcset="img/win/nox-tray-dark.png"><img src="img/win/nox-tray-light.png" alt="" loading="lazy"></picture>
+        <picture><source media="(prefers-color-scheme: dark)" srcset="pg/img/win/nox-panel-dark.png"><img src="pg/img/win/nox-panel-light.png" alt="The Nox panel open above the Windows tray" loading="lazy"></picture>
+        <picture class="tray"><source media="(prefers-color-scheme: dark)" srcset="pg/img/win/nox-tray-dark.png"><img src="pg/img/win/nox-tray-light.png" alt="" loading="lazy"></picture>
       </div>
     </div>
   </div>
@@ -300,16 +296,7 @@
           <h3>Private by design</h3>
           <p>No account, no network access and no analytics. The extension only checks whether Nox's switch is on. It never reads or sends what you browse.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="v2">
-    <div class="wrap">
-      <p class="kicker reveal">New in V2</p>
-      <h2 class="reveal">A smoother switch, and a better Windows setup</h2>
-      <p class="intro reveal">V2 makes the change from light to dark gentler and easier to live with.</p>
-      <div class="points">
+      
         <div class="point reveal">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v4l2.5 2"/></svg>
           <h3>A smooth fade</h3>
@@ -344,85 +331,49 @@
     </div>
   </section>
 
+
   <section id="screens">
     <div class="wrap">
       <p class="kicker reveal">A closer look</p>
       <h2 class="reveal">Set the night, skip the glare</h2>
       <p class="intro reveal">Screenshots of Nox. It also turns on by itself at the times you choose.</p>
-      <div class="gallery mac-only">
-        <figure class="reveal">
-          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-2-dark.png"><img src="showcase/nox-2-light.png" width="1760" height="1120" loading="lazy" alt="The same web page before and with Nox: bright on the left, dark on the right"></picture>
-          <figcaption>Bright pages, dark when Nox is on</figcaption>
-        </figure>
-        <figure class="reveal">
-          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-3-dark.png"><img src="showcase/nox-3-light.png" width="1760" height="1120" loading="lazy" alt="The Nox Settings window with dark at night times and quick picks"></picture>
-          <figcaption>Dark at night, on its own schedule</figcaption>
-        </figure>
-        <figure class="reveal">
-          <picture><source media="(prefers-color-scheme: dark)" srcset="showcase/nox-4-dark.png"><img src="showcase/nox-4-light.png" width="1760" height="1120" loading="lazy" alt="Three windows fading from light to dark"></picture>
-          <figcaption>A soft fade, never a flash</figcaption>
-        </figure>
-      </div>
+      <div class="pvgrid mac-only"><figure class="reveal" style="--w:420px"><div class="pv"><picture><source media="(prefers-color-scheme: dark)" srcset="pg/img/pop-panel-dark.png"><img src="pg/img/pop-panel-light.png" width="360" height="424" alt="The Nox panel with its switches" loading="lazy"></picture></div><figcaption>One switch, the whole Mac follows</figcaption></figure><figure class="reveal" style="--w:340px"><div class="pv"><picture><source media="(prefers-color-scheme: dark)" srcset="pg/img/pop-settings-dark.png"><img src="pg/img/pop-settings-light.png" width="300" height="502" alt="The Nox settings" loading="lazy"></picture></div><figcaption>Choose when it goes dark</figcaption></figure></div>
       <div class="wingal win-only">
-        <figure class="reveal"><picture><source media="(prefers-color-scheme: dark)" srcset="img/win/nox-panel-dark.png"><img src="img/win/nox-panel-light.png" alt="The tray panel: Light now in light mode, Dark now in dark mode" loading="lazy"></picture><figcaption>The tray panel: Light now in light mode, Dark now in dark mode</figcaption></figure>
+        <figure class="reveal"><picture><source media="(prefers-color-scheme: dark)" srcset="pg/img/win/nox-panel-dark.png"><img src="pg/img/win/nox-panel-light.png" alt="The tray panel: Light now in light mode, Dark now in dark mode" loading="lazy"></picture><figcaption>The tray panel: Light now in light mode, Dark now in dark mode</figcaption></figure>
       </div>
     </div>
   </section>
 
-  <section id="welcome">
-    <div class="wrap">
-      <p class="kicker reveal">Version 1.4.3</p>
-      <h2 class="reveal">A calm first minute</h2>
-      <p class="intro reveal mac-only">Three short pages: what Nox does, the permissions it asks for, and three tips. A frosted glass panel, and each page plays its animation once.</p>
-      <p class="intro reveal win-only">A short welcome that shows where Nox lives in the tray and how the one switch works.</p>
-      <div class="gallery welcome mac-only">
-        <figure class="reveal">
-          <img src="intro/nox-welcome-1.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 1: What Nox does">
-          <figcaption>What Nox does</figcaption>
-        </figure>
-        <figure class="reveal">
-          <img src="intro/nox-welcome-2.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 2: Three quick steps, each with its own Allow window">
-          <figcaption>Three quick steps, each with its own Allow window</figcaption>
-        </figure>
-        <figure class="reveal">
-          <img src="intro/nox-welcome-3.png" width="432" height="496" loading="lazy" alt="Nox welcome window, page 3: You're all set, with three tips">
-          <figcaption>You're all set, with three tips</figcaption>
-        </figure>
-      </div>
-      <div class="wingal win-only">
-        <figure class="reveal"><img src="intro/nox-welcome-win.png" width="380" height="436" loading="lazy" alt="Nox welcome window on Windows"><figcaption>The Windows welcome window</figcaption></figure>
-      </div>
-    </div>
-  </section>
 
   <section id="install">
     <div class="wrap">
       <p class="kicker reveal">Install</p>
-      <h2 class="reveal">A few steps, then it stays out of the way</h2>
-      <p class="intro reveal">Nox is not sold through an app store, so your computer may ask you to confirm it the first time you open it.</p>
+      <h2 class="reveal">Install Nox</h2>
+      <p class="intro reveal">Download it, open the disk image, drag Nox into Applications. Nox is signed and checked by Apple, so it opens like any normal app.</p>
       <div class="install">
         <div class="card mac reveal">
-          <h3><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>Mac<span class="yours">Your computer</span></h3>
+          <h3><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1.1-3.2-1-.0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3-1.5z"/></svg>Mac<span class="yours">Your computer</span></h3>
           <p class="req">macOS 13 or later</p>
+          <a class="dl" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg">Download for Mac <small>Nox.dmg</small></a>
+          <p class="or">Or paste this into Terminal. It downloads, installs and opens Nox in one go.</p>
+          <div class="code"><code>curl -fsSL https://solomon-69.github.io/Mac-Apps/download/install.sh | bash -s nox</code><button type="button" class="copy" data-copy>Copy</button></div>
           <ol>
-            <li><b>Download</b> Nox.dmg, open it and drag <b>Nox</b> into Applications.</li>
-            <li>Open Nox. A small switch appears in the menu bar.</li>
+            <li>Open the downloaded file and drag <b>Nox</b> into Applications.</li>
+            <li>Open Nox from Applications. Look for the <b>switch</b> in the menu bar and click it.</li>
             <li>Follow the welcome window and press <b>Allow</b> on Apple's prompts. Nox needs this to change light and dark.</li>
-            <li>For Safari: go to <b>Safari, Settings, Extensions</b>, tick <b>Nox</b>, then click <b>Edit Websites</b> and set it to <b>Allow</b>.</li>
-            <li>For Chrome: in the Nox panel click <b>Open extension folder</b>. In Chrome, open <b>chrome://extensions</b>, turn on <b>Developer mode</b>, click <b>Load unpacked</b> and choose that folder.</li>
+            <li>For websites: in Safari go to <b>Safari, Settings, Extensions</b>, tick <b>Nox</b> and set it to <b>Allow</b>. For Chrome, click <b>Open extension folder</b> in the Nox panel, then use <b>Load unpacked</b> on <b>chrome://extensions</b>.</li>
           </ol>
-          <p class="why">Why the extra steps: browsers need permission before an extension can change how a page looks.</p>
         </div>
         <div class="card win reveal">
-          <h3>Windows<span class="yours">Your computer</span></h3>
+          <h3><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.3l7.4-1v7.2H3zM11.3 4.2L21 2.8v8.7h-9.7zM3 12.4h7.4v7.2L3 18.6zM11.3 12.4H21v8.8l-9.7-1.4z"/></svg>Windows<span class="yours">Your computer</span></h3>
           <p class="req">Windows 10 or 11</p>
+          <a class="dl" href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip">Download for Windows <small>Nox-windows.zip</small></a>
           <ol>
-            <li><b>Download</b> Nox-windows.zip and choose <b>Extract All</b>.</li>
+            <li>Right-click <b>Nox-windows.zip</b> and choose <b>Extract All</b>. Keep the folder somewhere permanent, for example Documents.</li>
             <li>If asked, install the free <b>.NET 8 Desktop Runtime</b> from Microsoft.</li>
             <li>Run <b>Nox</b> from the extracted folder. Click the icon in the system tray (near the clock) to flip Windows between light and dark.</li>
             <li>If Windows shows a warning, click <b>More info</b>, then <b>Run anyway</b>.</li>
           </ol>
-          <p class="why">Why the warning: the Windows app is not code signed yet.</p>
         </div>
       </div>
     </div>
@@ -441,8 +392,8 @@
         <p>No. Web pages only go dark when Nox's own switch is on. Your Mac's dark mode on its own does not change them.</p>
       </details>
       <details class="reveal">
-        <summary>Why does it ask for Automation?</summary>
-        <p>Automation lets Nox switch light and dark. That is the only permission it asks for. Nox never needs Screen Recording: the smooth fade is done by macOS itself, and Nox never sees your screen.</p>
+        <summary>Why does it ask for Automation and Screen Recording?</summary>
+        <p>Automation lets Nox switch light and dark. Screen Recording is only for the smooth fade: Nox takes one still picture at the moment of switching. The picture stays in memory and is never saved or sent.</p>
       </details>
       <details class="reveal">
         <summary>Some sites look wrong when forced dark.</summary>
@@ -454,9 +405,14 @@
       </details>
     </div>
   </section>
-<section style="max-width:720px;margin:48px auto;padding:0 20px;font:15px/1.6 system-ui,-apple-system,sans-serif;color:inherit"><h2 style="font-size:20px;margin:0 0 8px">Unsigned app: how to open it</h2><p>This app is not signed yet (Apple's developer account is paid, and one is not set up yet), so your computer warns you the first time. <b>Mac:</b> right-click the app, choose <b>Open</b>, then <b>Open</b> again (or System Settings &gt; Privacy &amp; Security &gt; <b>Open Anyway</b>). <b>Windows:</b> in SmartScreen click <b>More info</b>, then <b>Run anyway</b>. You can check your download against the SHA-256 fingerprints listed in the project's CHECKSUMS.md on GitHub.</p></section>
+<section style="max-width:720px;margin:48px auto;padding:0 20px;font:15px/1.6 system-ui,-apple-system,sans-serif;color:inherit"><h2 style="font-size:20px;margin:0 0 8px">Opening the app</h2><p><b>Mac:</b> every app here is signed and checked by Apple (notarized), so it opens like any normal app: open the download, drag to Applications, double-click. <b>Windows:</b> the first time, SmartScreen may warn you: click <b>More info</b>, then <b>Run anyway</b>. You can check a download against the SHA-256 fingerprints in each release (the SHA256SUMS file) on GitHub.</p></section>
 </main>
 
+<section class="oss">
+  <div class="wrap">
+    <a class="ossbtn" href="https://github.com/Solomon-69/Nox" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg><span><b>Nox is open source</b><small>Read the code, report a problem or star it on GitHub</small></span><i>&rarr;</i></a>
+  </div>
+</section>
 <footer>
   <div class="wrap row">
     <div>
