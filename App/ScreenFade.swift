@@ -9,11 +9,11 @@ enum ScreenFade {
     private static var mode: Mode = .none
 
     /// Veil: how far it covers the screen at its peak (1 = fully opaque), and its timings.
-    private static let peak: CGFloat = 0.97
-    private static let rampIn: TimeInterval = 0.18
-    private static let veilOut: TimeInterval = 0.7
+    private static let peak: CGFloat = 0.18
+    private static let rampIn: TimeInterval = 0.12
+    private static let veilOut: TimeInterval = 0.45
     /// Extra settle time after our own look flips, so other apps have repainted underneath.
-    private static let settle: TimeInterval = 0.45
+    private static let settle: TimeInterval = 0.38
     /// DarkSwitch's own windows, lifted above the veil while it fades, with their old levels.
     private static var lifted: [(NSWindow, NSWindow.Level)] = []
     /// DarkSwitch's own windows held in the old look until the veil fade reaches them.

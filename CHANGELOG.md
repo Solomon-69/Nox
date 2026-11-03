@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.1] - 2026-11-03
+### Fixed
+- The light/dark fade is gentle again: a light veil that eases in and out, not a near-black cover over the whole screen.
+
 ## [1.5.0] - 2026-11-03
 ### Added
 - Check for updates: a new row at the bottom of Settings looks for a newer Nox, checks the download against its checksum, and installs it with one click.
