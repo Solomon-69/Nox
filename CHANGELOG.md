@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.4] - 2026-11-05
+### Fixed
+- Updates: the bar follows the real download, then shows checking and installing, and a failed update says why.
+
 ## [1.5.3] - 2026-11-03
 ### Fixed
 - The light/dark switch fades the way it did on Monday again: macOS's own smooth cross-fade of the whole screen when the Mac allows it, and the soft veil only when it does not.
