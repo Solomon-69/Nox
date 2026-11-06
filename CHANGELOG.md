@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.5] - 2026-11-06
+### Fixed
+- Nox could not switch the Mac at all in the signed release: it was missing the setting that lets it talk to System Events, so every switch failed, and after a restart that showed the permission pop-up. macOS now asks once, and that is the end of it.
+- The permission pop-up only appears if you press the switch and macOS has really refused. Switches Nox makes by itself never show a window; they quietly try again.
+
 ## [1.5.4] - 2026-11-05
 ### Fixed
 - Updates: the bar follows the real download, then shows checking and installing, and a failed update says why.

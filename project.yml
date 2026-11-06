@@ -9,8 +9,8 @@ settings:
   base:
     CODE_SIGN_STYLE: Manual
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.5.4"
-    CURRENT_PROJECT_VERSION: "4"
+    MARKETING_VERSION: "1.5.5"
+    CURRENT_PROJECT_VERSION: "5"
 targets:
   DarkSwitch:
     type: application
@@ -30,6 +30,11 @@ targets:
         NSHumanReadableCopyright: "Copyright © 2026 Solomon. MIT License."
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+    # Without this a notarised copy can never talk to System Events, so it can never switch the Mac.
+    entitlements:
+      path: App/Nox.entitlements
+      properties:
+        com.apple.security.automation.apple-events: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.solomon.DarkSwitch

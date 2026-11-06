@@ -10,6 +10,7 @@ private let forceDarkKey = "forceDark"
 let smoothFadeKey = "smoothFade"
 private let onboardedKey = "onboardingDone"
 private let scheduleKey = "nightSchedule"
+private let automationAskedKey = "automationAsked"
 private let darkAtKey = "darkAtMinutes"
 private let lightAtKey = "lightAtMinutes"
 private let showInDockKey = "showInDock"
@@ -46,6 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         refreshState()
         if !UserDefaults.standard.bool(forKey: onboardedKey) { showOnboarding() }
         startSchedule()
+        askAutomationOnce()
         // Tell our other apps where the quick switch is, so clicking it never closes their panels.
         publishToggleFrame()
         if let w = statusItem.button?.window {
@@ -87,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             return
         }
         dlog("keepdark(\(reason)): Mac is light but Nox dark is on: switching back to dark")
-        toggleMacDark(fade: false)
+        toggleMacDark(fade: false, quiet: true)
     }
 
     @objc private func keepDarkAfterWake() {
@@ -741,7 +743,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
 
     @objc private func toggleMacDark() { toggleMacDark(fade: true) }
 
-    private func toggleMacDark(fade: Bool) {
+    /// quiet: Nox started this itself (keep dark, the schedule), nobody pressed anything, so a failure
+    /// never puts up a window. It tries again a little later instead.
+    private func toggleMacDark(fade: Bool, quiet: Bool = false) {
         // A press while the last switch is still finishing is kept and run right after, never dropped.
         guard !isSwitching else { queuedToggle = true; dlog("switch: busy, press queued"); return }
         isSwitching = true
@@ -785,14 +789,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
             }
             if !ok {
                 NoxDark.apply(.noxSwitchFailed)
-                NoxDark.intent = !wantDark
+                NoxDark.intent = quiet ? wantDark : !wantDark
                 self.pendingDark = nil
                 self.animateIcon(to: wantDark ? 0 : 1)
                 self.model.isDark = !wantDark
-                if !self.lastSwitchTimedOut { DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {   // after the fade is gone
+                if quiet {
+                    self.retryQuietly()
+                } else if self.lastSwitchDenied { DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {   // after the fade is gone
                     self.alert("Nox needs permission to switch dark mode",
                                "Open System Settings, Privacy & Security, Automation, and allow Nox to control System Events. Then try again.")
                 } }
+            } else {
+                self.quietRetries = 0
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 self.isSwitching = false
@@ -805,8 +813,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
 
     private var isSwitching = false
     private var queuedToggle = false
-    /// System Events hung (not a permission problem): don't show the permission alert.
-    private var lastSwitchTimedOut = false
+    /// macOS really said no. Anything else (System Events still starting after a restart, or hung) is
+    /// not a permission problem, so it must never show the permission alert.
+    private var lastSwitchDenied = false
+    private var quietRetries = 0
+    private static let maxQuietRetries = 3
+    private static let quietRetryDelay: TimeInterval = 5
+    private static let notPermitted = -1743
+
+    private func retryQuietly() {
+        guard quietRetries < Self.maxQuietRetries else { dlog("switch: gave up after \(quietRetries) quiet tries"); return }
+        quietRetries += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.quietRetryDelay) { [weak self] in self?.keepDark(reason: "retry") }
+    }
+
+    /// Macs that updated from a copy that could not talk to System Events have never been asked:
+    /// ask once, on purpose, instead of at some random switch later.
+    private func askAutomationOnce() {
+        let state = Permissions.automationState()
+        dlog("automation: \(state.map { $0 ? "allowed" : "refused" } ?? "not asked yet")")
+        let d = UserDefaults.standard
+        guard state == nil, d.bool(forKey: onboardedKey), !d.bool(forKey: automationAskedKey) else { return }
+        d.set(true, forKey: automationAskedKey)
+        Task { @MainActor in
+            let ok = await Permissions.requestAutomation()
+            dlog("automation: asked, allowed=\(ok)")
+            if ok { self.keepDark(reason: "allowed") }
+        }
+    }
     private static let knobSlideTime: CFTimeInterval = 0.36
 
 
@@ -819,18 +853,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         """
         // If System Events hangs (it sometimes does while other apps use it), give up after a few
         // seconds instead of waiting forever: a held screen would look frozen.
-        lastSwitchTimedOut = false
+        lastSwitchDenied = false
         let failed: Bool = await withCheckedContinuation { done in
             let once = OnceFlag()
             Self.scriptQueue.async {
                 var error: NSDictionary?
                 NSAppleScript(source: script)?.executeAndReturnError(&error)
-                if once.claim() { done.resume(returning: error != nil) }
+                if let error { dlog("switch: failed \(error)") }
+                let denied = (error?[NSAppleScript.errorNumber] as? Int) == Self.notPermitted
+                if once.claim() {
+                    DispatchQueue.main.async { self.lastSwitchDenied = denied; done.resume(returning: error != nil) }
+                }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                 if once.claim() {
                     dlog("switch: System Events did not answer in 4 s")
-                    self.lastSwitchTimedOut = true
                     done.resume(returning: true)
                 }
             }
@@ -986,7 +1023,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         defer { lastNight = night }
         guard force || (lastNight != nil && lastNight != night) else { return }
         if night != systemIsDark, !isSwitching {
-            toggleMacDark()
+            toggleMacDark(fade: true, quiet: true)
             notify(night ? "Dark mode on for the night." : "Good morning: light mode is back on.")
         }
     }
