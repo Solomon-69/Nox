@@ -269,3 +269,5 @@ go through [SECURITY.md](SECURITY.md), not public issues.
 [MIT](LICENSE). Copyright (c) 2026 Solomon.
 
 More free apps by Solomon: [Mac-Apps](https://solomon-69.github.io/Mac-Apps/)
+
+<!-- updated 2026-11-15 -->
