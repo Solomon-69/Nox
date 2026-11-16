@@ -111,8 +111,7 @@ private struct OnboardingContent: View {
             footer
         }
         .padding(.horizontal, 22).padding(.top, 26).padding(.bottom, 16)
-        .background(glass)
-        .padding(16)
+        .padding(16)   // one layer: the content sits straight on the window background (no card)
         .frame(width: 456)
         .background(backdrop)
         .noFocusRing()
