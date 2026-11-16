@@ -26,6 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     private let extensionItem = NSMenuItem()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        IconRefresh.onceForThisVersion()   // new icon shows after an update
         // Renamed/moved app: point the login item at this copy.
         if SMAppService.mainApp.status == .enabled { try? SMAppService.mainApp.register() }
         // Old builds and Trash copies show up as extra "Nox" entries in Safari: forget them.

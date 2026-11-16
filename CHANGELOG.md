@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.7] - 2026-11-16
+### Fixed
+- The app icon now updates after an in-app update. The new app is stamped and re-registered with macOS, so Finder and the Dock stop showing the old cached icon.
+
 ## [1.5.6] - 2026-11-16
 ### Added
 - Dark websites now work like Safari's new Adaptive Dark Mode: light pages turn a soft dark grey (not pure black) with their colours kept, and photos keep their real colours.

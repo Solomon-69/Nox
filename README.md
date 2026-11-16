@@ -7,7 +7,7 @@
 <p><b>One click flips your Mac between light and dark. Websites go dark with it.</b></p>
 
 <p>
-  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Version 1.4.3" src="https://img.shields.io/badge/version-1.4.3-7C3AED?style=flat-square"></a>
+  <a href="https://github.com/Solomon-69/Nox/releases/latest"><img alt="Latest version" src="https://img.shields.io/github/v/release/Solomon-69/Nox?label=version&color=7C3AED&style=flat-square"></a>
   <img alt="macOS 13 or later" src="https://img.shields.io/badge/macOS-13%2B-1f1d1a?style=flat-square&logo=apple&logoColor=white">
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white">
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-5b8a5a?style=flat-square"></a>
@@ -15,7 +15,11 @@
 </p>
 
 <p>
-  <a href="https://github.com/Solomon-69/Nox/releases/latest"><b>Download</b></a>
+  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg"><b>Download for Mac</b></a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-mac.zip">Mac zip</a>
+  &nbsp;&middot;&nbsp;
+  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip"><b>Download for Windows</b></a>
   &nbsp;&middot;&nbsp;
   <a href="#install-on-mac">Install</a>
   &nbsp;&middot;&nbsp;
@@ -104,7 +108,7 @@ background. A Windows tray version and a Chrome and Edge extension follow the sa
 
 ## Install on Mac
 
-1. Download **Nox.dmg** (or the zip) from the [latest release](https://github.com/Solomon-69/Nox/releases/latest).
+1. Download **[Nox.dmg](https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg)** (or the [zip](https://github.com/Solomon-69/Nox/releases/latest/download/Nox-mac.zip)). Or paste one line in Terminal: `curl -fsSL https://solomon-69.github.io/Mac-Apps/download/install.sh | bash -s nox`.
 2. Open it and drag **Nox** into **Applications**.
 3. Open Nox from Applications. A small switch appears in your menu bar.
 4. A welcome window walks you through the permissions. Click each button and press **Allow** on Apple's prompts:
@@ -155,7 +159,7 @@ follows the system setting, since there is no Nox host to ask.
 
 ## Install on Windows
 
-1. Download **Nox-windows.zip** from the [latest release](https://github.com/Solomon-69/Nox/releases/latest) and unzip it.
+1. Download **[Nox-windows.zip](https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip)** and unzip it.
 2. Open **Nox.exe**. A switch icon appears in the tray (next to the clock). If you do not see it, click the small arrow to show hidden icons.
 3. Click the icon to flip Windows between light and dark. Open its panel for the night schedule and the smooth fade.
 4. For dark websites, use the panel's **Open extension folder** button, then load that folder in Chrome or Edge with **Load unpacked** (steps above).
