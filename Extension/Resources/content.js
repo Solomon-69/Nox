@@ -3,7 +3,10 @@
   const api = typeof browser !== "undefined" ? browser : (typeof chrome !== "undefined" ? chrome : null);
   const STYLE_ID = "darkswitch-style";
   const KEEP = "data-ds-keep";
-  const FILTER_CSS = `html { filter: invert(1) hue-rotate(180deg) !important; background: #fff; }`;
+  // Light pages turn a soft dark grey, not pure black, with the same colours (hue kept),
+  // like Safari's Adaptive Dark Mode. 0.94 maps white to about #0f0f0f and black text to
+  // light grey; re-flipped photos keep about 94% of their contrast.
+  const FILTER_CSS = `html { filter: invert(0.94) hue-rotate(180deg) !important; background: #fff; }`;
   // Re-flip only real photos and video so they keep true colours. Logos, icons and small
   // graphics flip WITH the page, so dark logo text (e.g. the Gmail wordmark) turns light.
   // Iframes are not flipped here: each frame decides for itself (see wantFilter).
@@ -49,6 +52,28 @@
   let enabled = false;
   let nativelyDark = false;
   let parentInverted = true; // frames assume the top page is inverted until told otherwise
+  let siteSkipped = false; // the person chose "Don't darken this site"
+
+  // Sites that already ship their own dark design say so with color-scheme: light dark
+  // (meta tag or CSS). Like Safari's Adaptive Dark Mode, leave those alone: they go dark themselves.
+  function declaresOwnDarkMode() {
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    const m = meta ? (meta.getAttribute("content") || "") : "";
+    const css = document.documentElement ? (getComputedStyle(document.documentElement).colorScheme || "") : "";
+    const both = (s) => /\blight\b/.test(s) && /\bdark\b/.test(s) && !/\bonly\b/.test(s);
+    return mq.matches && (both(m) || both(css));
+  }
+
+  function refreshSiteChoice() {
+    if (!api || !api.storage || !api.storage.local) return;
+    try {
+      const key = "skip:" + location.hostname;
+      api.storage.local.get(key).then((r) => {
+        siteSkipped = !!(r && r[key]);
+        apply();
+      }).catch(() => {});
+    } catch (e) {}
+  }
 
   function lum(r, g, b) { return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; }
 
@@ -102,7 +127,7 @@
   // Top frame: invert light pages only. Sub-frame: inside an inverted top page, invert only
   // frames that are already dark (double flip = original look); if top is untouched, do nothing.
   function wantFilter() {
-    if (!enabled || !darkNow()) return false;
+    if (!enabled || !darkNow() || siteSkipped) return false;
     if (isTop) return !nativelyDark;
     return parentInverted ? nativelyDark : false;
   }
@@ -122,7 +147,7 @@
     }
     classifyMedia();
     if (isTop) {
-      const inverted = enabled && darkNow() && !nativelyDark;
+      const inverted = enabled && darkNow() && !nativelyDark && !siteSkipped;
       for (const f of document.querySelectorAll("iframe")) {
         try { f.contentWindow.postMessage({ darkswitchInverted: inverted }, "*"); } catch (e) {}
       }
@@ -134,7 +159,7 @@
   function recheckPage() {
     const ours = document.getElementById(STYLE_ID);
     if (ours) ours.disabled = true;
-    nativelyDark = pageIsNativelyDark();
+    nativelyDark = declaresOwnDarkMode() || pageIsNativelyDark();
     if (ours) ours.disabled = false;
     apply();
   }
@@ -160,8 +185,15 @@
     });
   }
 
+  if (api && api.runtime && api.runtime.onMessage) {
+    api.runtime.onMessage.addListener((msg) => {
+      if (msg && msg.type === "siteChoiceChanged") refreshSiteChoice();
+    });
+  }
+
   recheckPage();
   refreshSetting();
+  refreshSiteChoice();
   // Dark mode just changed: ask again (Nox notes that it made the change a moment before it happens).
   mq.addEventListener("change", () => { recheckPage(); refreshSetting(); setTimeout(refreshSetting, 700); });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshSetting(); });

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.6] - 2026-11-16
+### Added
+- Dark websites now work like Safari's new Adaptive Dark Mode: light pages turn a soft dark grey (not pure black) with their colours kept, and photos keep their real colours.
+- Right-click any page in Safari and choose "Nox: Don't darken this site" to leave one site alone. "Nox: Darken this site again" undoes it.
+- Sites that already have their own dark design (they declare `color-scheme: light dark`) are left alone, as Safari does.
+
 ## [1.5.5] - 2026-11-06
 ### Fixed
 - Nox could not switch the Mac at all in the signed release: it was missing the setting that lets it talk to System Events, so every switch failed, and after a restart that showed the permission pop-up. macOS now asks once, and that is the end of it.

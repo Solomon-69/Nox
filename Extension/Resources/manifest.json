@@ -1,13 +1,35 @@
 {
   "manifest_version": 3,
   "name": "Nox",
-  "version": "1.0.0",
-  "description": "Turns web pages dark when Nox turns your Mac dark.",
-  "icons": {"128": "images/icon-128.png"},
-  "permissions": ["nativeMessaging"],
-  "host_permissions": ["<all_urls>"],
-  "background": {"scripts": ["background.js"], "persistent": false},
+  "version": "1.1.0",
+  "description": "Turns light web pages dark when Nox turns your Mac dark, like Safari's Adaptive Dark Mode.",
+  "icons": {
+    "128": "images/icon-128.png"
+  },
+  "permissions": [
+    "nativeMessaging",
+    "contextMenus",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
   "content_scripts": [
-    {"matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_start", "all_frames": true}
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
   ]
 }

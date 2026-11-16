@@ -9,8 +9,8 @@ settings:
   base:
     CODE_SIGN_STYLE: Manual
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.5.5"
-    CURRENT_PROJECT_VERSION: "5"
+    MARKETING_VERSION: "1.5.6"
+    CURRENT_PROJECT_VERSION: "6"
 targets:
   DarkSwitch:
     type: application
