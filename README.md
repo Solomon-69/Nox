@@ -15,17 +15,9 @@
 </p>
 
 <p>
-  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg"><b>Download for Mac</b></a>
-  &nbsp;&middot;&nbsp;
-  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-mac.zip">Mac zip</a>
-  &nbsp;&middot;&nbsp;
-  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip"><b>Download for Windows</b></a>
-  &nbsp;&middot;&nbsp;
-  <a href="#install-on-mac">Install</a>
-  &nbsp;&middot;&nbsp;
-  <a href="#turn-on-the-safari-extension">Safari setup</a>
-  &nbsp;&middot;&nbsp;
-  <a href="PRIVACY.md">Privacy</a>
+  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox.dmg"><img alt="Download for Mac" height="40" src="https://img.shields.io/badge/Download_for_Mac-1f1d1a?style=for-the-badge&logo=apple&logoColor=white"></a>
+  &nbsp;
+  <a href="https://github.com/Solomon-69/Nox/releases/latest/download/Nox-windows.zip"><img alt="Download for Windows" height="40" src="https://img.shields.io/badge/Download_for_Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white"></a>
 </p>
 
 <br>
