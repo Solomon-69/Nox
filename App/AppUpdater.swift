@@ -176,6 +176,7 @@ func updateProblem(_ e: Error, app: String) -> String {
         case idle, checking, upToDate, notPublished, available(String), downloading(Double), installing, failed(String)
     }
     @Published private(set) var state: State = .idle
+    @Published private(set) var lastChecked: Date?
     let cfg: UpdateConfig
     private var found: (zip: URL, sums: URL)?
     private var apiURL: URL { URL(string: "https://api.github.com/repos/\(cfg.repo)/releases/latest")! }
@@ -191,29 +192,63 @@ func updateProblem(_ e: Error, app: String) -> String {
         #endif
     }
     private var testAPI: URL?
+    #if UPDATER_TEST
+    func forceState(_ s: State) { state = s }
+    #endif
 
     func check() async {
         guard state != .checking, state != .installing else { return }
         if case .downloading = state { return }
         state = .checking
+        let started = Date()
+        let result = await lookUp()
+        // Keep the spinner up for a moment so a fast answer still reads as "checked".
+        let spent = Date().timeIntervalSince(started)
+        if spent < 0.6 { try? await Task.sleep(nanoseconds: UInt64((0.6 - spent) * 1_000_000_000)) }
+        if case .upToDate = result { lastChecked = Date() }
+        state = result
+    }
+
+    /// GitHub's API first; if it refuses (rate limit, outage) the public releases page is asked instead.
+    private func lookUp() async -> State {
+        var apiProblem = false
         do {
             var req = URLRequest(url: testAPI ?? apiURL)
             req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
             let (data, resp) = try await UpdateFiles.session(cfg.appName).data(for: req)
             let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
-            if code == 404 { state = .notPublished; return }
-            guard code == 200, let rel = try JSONSerialization.jsonObject(with: data) as? [String: Any], let tag = rel["tag_name"] as? String else {
-                state = .failed("GitHub did not answer. Try again in a minute."); return
+            if code == 404 { return .notPublished }
+            if code == 200, let rel = try? JSONSerialization.jsonObject(with: data) as? [String: Any], let tag = rel["tag_name"] as? String {
+                guard UpdateFiles.isNewer(tag, than: currentVersion) else { return .upToDate }
+                let assets = rel["assets"] as? [[String: Any]] ?? []
+                func url(_ n: String) -> URL? { (assets.first { $0["name"] as? String == n }?["browser_download_url"] as? String).flatMap(URL.init(string:)) }
+                guard let z = url(cfg.zipName), let s = url("SHA256SUMS.txt") else { return .failed("The new version has no download yet. Try again later.") }
+                found = (z, s)
+                return .available(tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV")))
             }
-            guard UpdateFiles.isNewer(tag, than: currentVersion) else { state = .upToDate; return }
-            let assets = rel["assets"] as? [[String: Any]] ?? []
-            func url(_ n: String) -> URL? { (assets.first { $0["name"] as? String == n }?["browser_download_url"] as? String).flatMap(URL.init(string:)) }
-            guard let z = url(cfg.zipName), let s = url("SHA256SUMS.txt") else { state = .failed("The new version has no download yet."); return }
-            found = (z, s)
-            state = .available(tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV")))
+            apiProblem = true
         } catch {
-            state = .failed("Could not reach GitHub. Check your internet and try again.")
+            apiProblem = true
         }
+        if apiProblem, testAPI == nil, let tag = await latestTagFromPage() {
+            guard UpdateFiles.isNewer(tag, than: currentVersion) else { return .upToDate }
+            let base = "https://github.com/\(cfg.repo)/releases/download/\(tag)/"
+            if let z = URL(string: base + cfg.zipName), let s = URL(string: base + "SHA256SUMS.txt") {
+                found = (z, s)
+                return .available(tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV")))
+            }
+        }
+        return .failed("Could not reach GitHub. Check your internet and try again.")
+    }
+
+    /// Backup route: github.com/<repo>/releases/latest redirects to .../releases/tag/<tag>.
+    private func latestTagFromPage() async -> String? {
+        guard let page = URL(string: "https://github.com/\(cfg.repo)/releases/latest") else { return nil }
+        var req = URLRequest(url: page); req.httpMethod = "HEAD"
+        guard let (_, resp) = try? await UpdateFiles.session(cfg.appName).data(for: req),
+              let final = (resp as? HTTPURLResponse)?.url, final.pathComponents.contains("tag") else { return nil }
+        let tag = final.lastPathComponent
+        return tag.isEmpty || tag == "latest" ? nil : tag
     }
 
     func install() async {
@@ -286,10 +321,11 @@ struct UpdateRow: View {
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(ink)
-                    Text(subtitle).font(.system(size: 11)).foregroundStyle(mute).fixedSize(horizontal: false, vertical: true)
+                    Text(subtitle).font(.system(size: 11)).foregroundStyle(mute).lineLimit(nil).fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer(minLength: 8)
-                button
+                .frame(maxWidth: .infinity, alignment: .leading)   // the text wraps to the width left over, never "…"
+                button.fixedSize()
+                    .animation(.spring(response: 0.35, dampingFraction: 0.7), value: updater.state)
             }
             if case .downloading(let p) = updater.state {
                 GeometryReader { g in
@@ -316,7 +352,7 @@ struct UpdateRow: View {
         switch updater.state {
         case .idle: return "You have version \(updater.currentVersion)."
         case .checking: return "Looking for a newer version…"
-        case .upToDate: return "You have the newest version (\(updater.currentVersion))."
+        case .upToDate: return "Checked just now. You have the newest version (\(updater.currentVersion))."
         case .notPublished: return "No public release yet, so there is nothing newer to get."
         case .available: return "You have \(updater.currentVersion). The update is checked before it is installed."
         case .downloading(let p): return p <= 90 ? "\(Int(p / 90 * 100))% downloaded. \(updater.cfg.appName) restarts by itself when it is done." : "Checking the download…"
@@ -329,7 +365,12 @@ struct UpdateRow: View {
         case .available:
             pill("Update now") { Task { await updater.install() } }
         case .checking, .downloading, .installing:
-            ProgressView().controlSize(.small)
+            ProgressView().controlSize(.small).frame(height: 28)
+        case .upToDate:
+            UpToDateBadge { Task { await updater.check() } }
+                .transition(.scale(scale: 0.6).combined(with: .opacity))
+        case .failed:
+            pill("Try again") { Task { await updater.check() } }
         default:
             pill("Check for updates") { Task { await updater.check() } }
         }
@@ -337,10 +378,36 @@ struct UpdateRow: View {
     private func pill(_ text: String, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(text).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(onTint)
-                .padding(.horizontal, 12).frame(height: 28)
+                .lineLimit(1).fixedSize().padding(.horizontal, 12).frame(height: 28)
                 .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(tint))
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// Green tick shown after a check finds nothing newer. Tap it to check again.
+struct UpToDateBadge: View {
+    var recheck: () -> Void
+    @State private var pop = false
+    static let green = Color(red: 0.20, green: 0.78, blue: 0.42)
+
+    var body: some View {
+        Button(action: recheck) {
+            HStack(spacing: 5) {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 11, weight: .heavy))
+                    .scaleEffect(pop ? 1 : 0.3)
+                    .rotationEffect(.degrees(pop ? 0 : -25))
+                Text("Up to date").font(.system(size: 11.5, weight: .semibold)).lineLimit(1).fixedSize()
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 12).frame(height: 28)
+            .background(Capsule(style: .continuous).fill(Self.green))
+        }
+        .buttonStyle(.plain)
+        .help("Checked just now. Click to check again.")
+        .accessibilityLabel("Up to date. Click to check again.")
+        .onAppear { withAnimation(.spring(response: 0.4, dampingFraction: 0.55).delay(0.05)) { pop = true } }
     }
 }
 

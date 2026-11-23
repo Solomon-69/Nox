@@ -141,51 +141,49 @@ private struct MainContent: View {
     @State private var scriptStarted = false
     @StateObject private var updater = AppUpdater(UpdateConfig(repo: "Solomon-69/Nox", appName: "Nox", bundleName: "Nox.app", zipName: "Nox-mac.zip"))
 
+    @State private var tab: NoxTab = .dark
+    @Namespace private var tabNS
+
     var body: some View {
-        VStack(spacing: 18) {
-            VStack(spacing: 10) {
-                statusRow.navRow(.status)
-                SettingRow(icon: "globe", title: "Websites follow your Mac",
-                           detail: "Safari pages go dark with your Mac",
-                           isOn: Binding(get: { model.forceDark }, set: { model.setForceDark($0) })).navRow(.websites)
-                SettingRow(icon: "moon.stars", title: "Dark at night",
-                           detail: "Switches by itself at the times below",
-                           isOn: Binding(get: { model.nightSchedule }, set: { model.setNightSchedule($0) })).navRow(.night)
-                if model.nightSchedule { timesRow.navRow(.times) }
-                SettingRow(icon: "wand.and.rays", title: "Smooth fade",
-                           detail: "Softens the switch across every open app",
-                           isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) })).navRow(.fade)
-                SettingRow(icon: "power", title: "Open at login",
-                           detail: "Start Nox when your Mac starts",
-                           isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) })).navRow(.login)
-                SettingRow(icon: "dock.rectangle", title: "Show in Dock",
-                           detail: "Off: Nox stays in the menu bar only",
-                           isOn: Binding(get: { model.showInDock }, set: { model.setShowInDock($0) })).navRow(.dock)
-                extensionRow.navRow(.ext)
-                NoxShareRow(trigger: shareTick).navRow(.share)
-                UpdateRow(updater: updater, tint: theme.violet, ink: theme.text, mute: theme.dim, track: theme.trackOff, onTint: .white)
-                    .modifier(CardStyle()).navRow(.update)
+        HStack(spacing: 0) {
+            sidebar
+            Rectangle().fill(theme.stroke).frame(width: 1)
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        banner
+                        rows
+                    }
+                    .padding(22)
+                    .coordinateSpace(name: "nav")
+                    .onPreferenceChange(NavRectKey.self) { rects = $0 }
+                    .overlay(alignment: .topLeading) {
+                        NavHighlight(rect: sel.flatMap { tab.rows.contains($0) ? rects[$0] : nil })
+                            .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: sel)
+                            .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: rects[sel ?? .status])
+                    }
+                    .id(tab)
+                    .transition(.opacity.combined(with: .offset(y: 6)))
+                }
+                .onChange(of: sel) { id in
+                    guard let id else { return }
+                    withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo(id, anchor: .center) }
+                }
             }
-            .coordinateSpace(name: "nav")
-            .onPreferenceChange(NavRectKey.self) { rects = $0 }
-            .overlay(alignment: .topLeading) {
-                NavHighlight(rect: sel.flatMap { rects[$0] })
-                    .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: sel)
-                    .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.82), value: rects[sel ?? .status])
-            }
-            Text("Click the menu bar switch once to flip dark mode. Right-click it (or Option-click) for options.")
-                .font(.system(size: 11))
-                .foregroundStyle(theme.dim)
-                .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity, alignment: .top)
         }
-        .padding(.horizontal, 28).padding(.bottom, 24).padding(.top, 8)
-        .frame(width: 420)
+        .frame(width: 700, height: 470)
         .background(LinearGradient(colors: [theme.bgTop, theme.bgBottom], startPoint: .top, endPoint: .bottom)
             .ignoresSafeArea())
         .noFocusRing()
         .background(NavKeyCatcher(handle: handleKey, window: { hostWindow = $0 }))
+        .onChange(of: sel) { id in
+            // Arrow keys walk through every row; the sidebar follows to the page that row is on.
+            if let id, let t = NoxTab.allCases.first(where: { $0.rows.contains(id) }), t != tab { show(t) }
+        }
         .onAppear {
             if sel == nil { sel = startRow }
+            if let s = startRow, let t = NoxTab.allCases.first(where: { $0.rows.contains(s) }) { tab = t }
             guard !scriptedKeys.isEmpty, !scriptStarted else { return }
             scriptStarted = true
             for (i, k) in scriptedKeys.enumerated() {   // tests: the same handler the real keys use
@@ -194,9 +192,79 @@ private struct MainContent: View {
         }
     }
 
+    private func show(_ t: NoxTab) {
+        withAnimation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.85)) { tab = t }
+    }
+
+    private var sidebar: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 10) {
+                Image(nsImage: NSApp.applicationIconImage).resizable().interpolation(.high).frame(width: 38, height: 38)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Nox").font(.system(size: 17, weight: .bold)).tracking(-0.3).foregroundStyle(theme.text)
+                    Text("Settings").font(.system(size: 11)).foregroundStyle(theme.dim)
+                }
+            }
+            .padding(.bottom, 14).padding(.top, 22)
+            ForEach(NoxTab.allCases) { t in
+                NoxSidebarRow(tab: t, on: t == tab, ns: tabNS) { sel = nil; show(t) }
+            }
+            Spacer(minLength: 8)
+            Text("Click the menu bar switch to flip dark mode. Right-click it for options.")
+                .font(.system(size: 10.5)).foregroundStyle(theme.dim).lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(width: 196)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .background(theme.card.opacity(0.5))
+    }
+
+    private var banner: some View {
+        HStack(spacing: 12) {
+            RowIcon(name: tab.symbol)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tab.title).font(.system(size: 22, weight: .bold)).tracking(-0.4).foregroundStyle(theme.text)
+                Text(tab.blurb).font(.system(size: 12)).foregroundStyle(theme.dim)
+            }
+            Spacer()
+        }
+        .padding(.bottom, 6).padding(.top, 8)
+    }
+
+    @ViewBuilder private var rows: some View {
+        switch tab {
+        case .dark:
+            statusRow.navRow(.status).id(NavID.status)
+            SettingRow(icon: "moon.stars", title: "Dark at night",
+                       detail: "Switches by itself at the times below",
+                       isOn: Binding(get: { model.nightSchedule }, set: { model.setNightSchedule($0) })).navRow(.night).id(NavID.night)
+            if model.nightSchedule { timesRow.navRow(.times).id(NavID.times) }
+        case .web:
+            SettingRow(icon: "globe", title: "Websites follow your Mac",
+                       detail: "Safari pages go dark with your Mac",
+                       isOn: Binding(get: { model.forceDark }, set: { model.setForceDark($0) })).navRow(.websites).id(NavID.websites)
+            extensionRow.navRow(.ext).id(NavID.ext)
+        case .general:
+            SettingRow(icon: "wand.and.rays", title: "Smooth fade",
+                       detail: "Softens the switch across every open app",
+                       isOn: Binding(get: { model.smoothFade }, set: { model.setSmoothFade($0) })).navRow(.fade).id(NavID.fade)
+            SettingRow(icon: "power", title: "Open at login",
+                       detail: "Start Nox when your Mac starts",
+                       isOn: Binding(get: { model.openAtLogin }, set: { model.setOpenAtLogin($0) })).navRow(.login).id(NavID.login)
+            SettingRow(icon: "dock.rectangle", title: "Show in Dock",
+                       detail: "Off: Nox stays in the menu bar only",
+                       isOn: Binding(get: { model.showInDock }, set: { model.setShowInDock($0) })).navRow(.dock).id(NavID.dock)
+        case .about:
+            UpdateRow(updater: updater, tint: theme.violet, ink: theme.text, mute: theme.dim, track: theme.trackOff, onTint: .white)
+                .modifier(CardStyle()).navRow(.update).id(NavID.update)
+            NoxShareRow(trigger: shareTick).navRow(.share).id(NavID.share)
+        }
+    }
+
     // MARK: Keyboard
 
-    private var navOrder: [NavID] { NavID.allCases.filter { $0 != .times || model.nightSchedule } }
+    private var navOrder: [NavID] { NoxTab.allCases.flatMap(\.rows).filter { $0 != .times || model.nightSchedule } }
 
     private func handleKey(_ key: NavKey) -> Bool {
         switch key {
@@ -734,5 +802,63 @@ struct FooterPressStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+/// The four Settings pages, in sidebar order. Each lists its rows in keyboard order.
+enum NoxTab: Int, CaseIterable, Identifiable {
+    case dark, web, general, about
+    var id: Int { rawValue }
+    var title: String { ["Dark mode", "Websites", "General", "About"][rawValue] }
+    var blurb: String {
+        ["Switch now, or let Nox follow the clock", "Make Safari pages match your Mac", "Fade, login and Dock", "Updates and sharing"][rawValue]
+    }
+    var symbol: String { ["moon.fill", "globe", "gearshape.fill", "info.circle.fill"][rawValue] }
+    var rows: [NavID] {
+        switch self {
+        case .dark: return [.status, .night, .times]
+        case .web: return [.websites, .ext]
+        case .general: return [.fade, .login, .dock]
+        case .about: return [.update, .share]
+        }
+    }
+}
+
+/// One sidebar tab. The selected tab carries a soft violet pill that slides between tabs with a spring.
+struct NoxSidebarRow: View {
+    @Environment(\.noxTheme) private var theme
+    let tab: NoxTab
+    let on: Bool
+    let ns: Namespace.ID
+    let select: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 11, style: .continuous)
+        HStack(spacing: 9) {
+            Image(systemName: tab.symbol).font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(on ? theme.violet : (hover ? theme.text : theme.dim)).frame(width: 18)
+            Text(tab.title).font(.system(size: 12.5, weight: on ? .semibold : .medium))
+                .foregroundStyle(on || hover ? theme.text : theme.dim)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10).frame(height: 36)
+        .background {
+            if on {
+                shape.fill(theme.violet.opacity(0.16))
+                    .overlay(shape.strokeBorder(theme.violet.opacity(0.5), lineWidth: 1))
+                    .matchedGeometryEffect(id: "tabpill", in: ns)
+            } else if hover {
+                shape.fill(theme.card)
+            }
+        }
+        .contentShape(shape)
+        .animation(.easeOut(duration: 0.14), value: hover)
+        .onHover { hover = $0 }
+        .onTapGesture(perform: select)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(tab.title)
+        .accessibilityAddTraits(on ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAction(.default, select)
     }
 }

@@ -56,12 +56,13 @@
 /* Begin PBXFileReference section */
 		07C87D0D2C693D8A44AC3AB2 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
 		0D955A2D519805D51DBD2AF9 /* ShareFriend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareFriend.swift; sourceTree = "<group>"; };
+		1026B12920675BA1F4E46133 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationCleanup.swift; sourceTree = "<group>"; };
 		195D24DFC07FDD050B4A1ED5 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		45EE801EEFDB6035BFB4A044 /* Nox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nox.entitlements; sourceTree = "<group>"; };
 		47307AD18F15B21D4201A35B /* icon-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-128.png"; sourceTree = "<group>"; };
 		4E282D52EF3A773E72070DAC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5227CD8D69D4E58BDA61B40F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		57BAD285A8276B42A2AD4316 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		67A431E8F0855D333CF0A7FF /* SmoothSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothSwitch.swift; sourceTree = "<group>"; };
 		68A724A917DD3BC8D833A04B /* NoxDark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoxDark.swift; sourceTree = "<group>"; };
@@ -93,19 +94,10 @@
 			children = (
 				F6027241FC83414EEADAA51F /* App */,
 				8EEB30026DF2028782E19526 /* Extension */,
-				4CF3F939DDAA4DFF3EF7AAAE /* nox-clone */,
+				B16F5F1D9487C301976665D3 /* nox-crashfix */,
 				BF82F628BEE3E9F79813B2ED /* Resources */,
 				F3C9953C35A7A0E580E9E549 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		4CF3F939DDAA4DFF3EF7AAAE /* nox-clone */ = {
-			isa = PBXGroup;
-			children = (
-				57BAD285A8276B42A2AD4316 /* Signing.xcconfig */,
-			);
-			name = "nox-clone";
-			path = .;
 			sourceTree = "<group>";
 		};
 		8EEB30026DF2028782E19526 /* Extension */ = {
@@ -114,6 +106,15 @@
 				EAC3F459D9306E1C1F7A65E2 /* SafariWebExtensionHandler.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		B16F5F1D9487C301976665D3 /* nox-crashfix */ = {
+			isa = PBXGroup;
+			children = (
+				1026B12920675BA1F4E46133 /* Signing.xcconfig */,
+			);
+			name = "nox-crashfix";
+			path = .;
 			sourceTree = "<group>";
 		};
 		BF82F628BEE3E9F79813B2ED /* Resources */ = {
@@ -147,6 +148,7 @@
 				4E282D52EF3A773E72070DAC /* Info.plist */,
 				5227CD8D69D4E58BDA61B40F /* main.swift */,
 				5D8DA32F98B4D6A0C8099F2F /* MainWindow.swift */,
+				45EE801EEFDB6035BFB4A044 /* Nox.entitlements */,
 				68A724A917DD3BC8D833A04B /* NoxDark.swift */,
 				EDCF39882CF16933AFF21C75 /* Onboarding.swift */,
 				13CE2AC545931D4C86F49E4D /* RegistrationCleanup.swift */,
@@ -323,6 +325,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/Nox.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -338,7 +341,7 @@
 		};
 		A813D6243DEAB688A8BCCCAC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57BAD285A8276B42A2AD4316 /* Signing.xcconfig */;
+			baseConfigurationReference = 1026B12920675BA1F4E46133 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -372,7 +375,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -385,7 +388,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -398,7 +401,7 @@
 		};
 		BA8001FD1440D8D3D58E290F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57BAD285A8276B42A2AD4316 /* Signing.xcconfig */;
+			baseConfigurationReference = 1026B12920675BA1F4E46133 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -432,7 +435,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -451,7 +454,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.5.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -485,6 +488,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/Nox.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = NO;

@@ -16,6 +16,11 @@ private let lightAtKey = "lightAtMinutes"
 private let showInDockKey = "showInDock"
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDelegate {
+    /// Opening the app only adds the menu bar icon. macOS can send a "reopen" right as the app starts
+    /// (login, relaunch after an update, a second launch while it starts), so reopens in the first
+    /// seconds are ignored: Settings and the panel only open when the person asks for them.
+    private let launchedAt = Date()
+    private var justLaunched: Bool { Date().timeIntervalSince(launchedAt) < 5 }
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
     private let model = DarkSwitchModel()
@@ -122,6 +127,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
 
     /// Opening the app again (Finder, Spotlight, Launchpad) shows the window.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if justLaunched { return false }
         showWindow()
         return true
     }
